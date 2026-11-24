@@ -3,6 +3,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const { check } = require("./advisor");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/api/garage", (req, res) => {
   const db = readDb();
   res.json({ vehicle: db.vehicle, history: db.history });
+});
+
+// The page sends the user's question here and gets back a structured answer.
+app.post("/api/check", (req, res) => {
+  const db = readDb();
+  res.json(check(req.body && req.body.question, { vehicle: db.vehicle, history: db.history }));
 });
 
 app.listen(PORT, () => {

@@ -1,0 +1,110 @@
+{
+  "_note": "MADE-UP SAMPLE ESTIMATES for a course prototype (M1). Intervals, prices and difficulty are placeholders to be checked against the official Toyota manuals before any real use.",
+  "vehicles": [
+    {
+      "id": "rav4-2025",
+      "year": 2025,
+      "make": "Toyota",
+      "model": "RAV4",
+      "trims": ["LE", "XLE", "XLE Premium", "Limited", "Trail", "TRD Off-Road"],
+      "match": ["rav4"],
+      "hybrid": false
+    },
+    {
+      "id": "rav4-hybrid-2026",
+      "year": 2026,
+      "make": "Toyota",
+      "model": "RAV4 Hybrid",
+      "trims": ["LE", "XLE", "XSE", "Limited", "Woodland"],
+      "match": ["rav4 hybrid", "rav4hybrid"],
+      "hybrid": true
+    }
+  ],
+  "schedule": {
+    "everyKm": 8000,
+    "source": { "label": "Toyota owner's manuals and maintenance schedules (placeholder: exact page to be linked)", "url": "https://www.toyota.com/owners/" },
+    "items": [
+      { "everyKm": 8000, "service": "tire_rotation" },
+      { "everyKm": 8000, "text": "Multi-point inspection (brakes, fluids, belts, lights)" },
+      { "everyKm": 16000, "service": "oil_change" },
+      { "everyKm": 24000, "service": "cabin_air_filter" },
+      { "everyKm": 48000, "service": "engine_air_filter" }
+    ]
+  },
+  "services": [
+    {
+      "id": "engine_air_filter",
+      "name": "Engine air filter replacement",
+      "keywords": ["engine air filter", "engine filter", "air filter"],
+      "replaceEveryKm": 48000,
+      "importance": "routine",
+      "importanceNote": "Routine wear item. A dirty filter slowly lowers efficiency; it is rarely urgent.",
+      "shopCost": { "low": 50, "high": 90 },
+      "partsCost": { "low": 20, "high": 35 },
+      "diy": { "level": 1, "minutes": 10 },
+      "parts": ["Engine air filter for your model"],
+      "tools": ["Usually none (clips by hand)"]
+    },
+    {
+      "id": "cabin_air_filter",
+      "name": "Cabin air filter replacement",
+      "keywords": ["cabin air filter", "cabin filter", "cabin"],
+      "replaceEveryKm": 24000,
+      "importance": "routine",
+      "importanceNote": "Comfort item that filters the air you breathe inside. Not a safety or engine issue.",
+      "shopCost": { "low": 50, "high": 100 },
+      "partsCost": { "low": 15, "high": 30 },
+      "diy": { "level": 1, "minutes": 10 },
+      "parts": ["Cabin air filter for your model"],
+      "tools": ["None (behind the glove box)"]
+    },
+    {
+      "id": "brake_pads",
+      "name": "Brake pad replacement",
+      "keywords": ["brake pad", "brake pads", "brakes", "brake"],
+      "safety": true,
+      "minThicknessMm": 3,
+      "importance": "safety",
+      "importanceNote": "Brakes are safety-critical. Pads at or below about 3 mm are generally due for replacement.",
+      "shopCost": { "low": 200, "high": 400 },
+      "partsCost": { "low": 50, "high": 120 },
+      "diy": { "level": 3, "minutes": 90 },
+      "parts": ["Brake pads (front or rear set)", "Brake hardware kit"],
+      "tools": ["Jack and jack stands", "Lug wrench", "Socket set", "C-clamp or caliper tool", "Torque wrench"]
+    },
+    {
+      "id": "oil_change",
+      "name": "Oil and filter change",
+      "keywords": ["oil change", "oil and filter", "oil"],
+      "replaceEveryKm": 16000,
+      "importance": "important",
+      "importanceNote": "Keeps the engine healthy. Follow the interval; do not skip it.",
+      "shopCost": { "low": 70, "high": 130 },
+      "partsCost": { "low": 40, "high": 60 },
+      "diy": { "level": 2, "minutes": 45 },
+      "parts": ["0W-16 synthetic oil (check your manual)", "Oil filter", "Drain plug gasket"],
+      "tools": ["Jack and jack stands or ramps", "Oil filter wrench", "Drain pan", "Socket set"]
+    },
+    {
+      "id": "tire_rotation",
+      "name": "Tire rotation",
+      "keywords": ["tire rotation", "rotate tires", "rotation"],
+      "replaceEveryKm": 8000,
+      "importance": "routine",
+      "importanceNote": "Evens out tire wear so tires last longer.",
+      "shopCost": { "low": 25, "high": 60 },
+      "partsCost": { "low": 0, "high": 0 },
+      "diy": { "level": 2, "minutes": 40 },
+      "parts": ["None"],
+      "tools": ["Jack and jack stands", "Lug wrench", "Torque wrench"]
+    }
+  ],
+  "diyScale": {
+    "1": "Very easy: no tools",
+    "2": "Easy: basic tools",
+    "3": "Moderate: needs lifting the car and some experience",
+    "4": "Hard: special tools",
+    "5": "Leave to a professional"
+  },
+  "disclaimer": "Auto-Mobile gives general information from sample data, not professional advice. It accepts no liability for decisions made from it. Have a qualified technician check anything you are unsure of, and anything safety related."
+}
