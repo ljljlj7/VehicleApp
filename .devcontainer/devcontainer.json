@@ -1,0 +1,16 @@
+{
+  // GitHub Codespaces setup: opens the app from the GitHub repo in the browser.
+  // The AI key comes from GitHub Settings -> Codespaces -> Secrets (ANTHROPIC_API_KEY), never from a file.
+  "name": "Auto-Mobile",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Auto-Mobile", "onAutoForward": "openPreview" }
+  },
+  "secrets": {
+    "ANTHROPIC_API_KEY": {
+      "description": "Anthropic API key for the AI advisor (M2). Without it the app uses built-in rules."
+    }
+  }
+}

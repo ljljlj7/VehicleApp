@@ -34,7 +34,9 @@ After the app first runs, write the install, run and test commands here and keep
 
 - Needs: Node.js LTS (`winget install --id OpenJS.NodeJS.LTS -e`)
 - Install: `npm install`
-- Run: `npm start`, then open http://localhost:3000 (stop with Ctrl+C)
+- Run in GitHub Codespaces (main way): on github.com/ljljlj7/VehicleApp click Code → Codespaces → Create codespace on main, then type `npm start` in its terminal; the app opens in a preview tab.
+- AI key: GitHub → Settings → Codespaces → Secrets → New secret, name `ANTHROPIC_API_KEY`, repository `ljljlj7/VehicleApp`. Restart the codespace after adding it. Without a key the app uses built-in rules.
+- Run on a laptop instead: `npm.cmd start` in the project folder (plain `npm` is blocked by Windows PowerShell's script setting), then open http://localhost:3000 (stop with Ctrl+C). The key can go in a local `.env` (copy `.env.example`); it is never uploaded.
 - Test: no automated tests yet; click through acceptance-test.md in the running app
 
 ## Data and secrets

@@ -100,9 +100,41 @@ function followUpBlock(answer) {
     panel);
 }
 
-function renderAnswer(a) {
+// "Report a problem": lets the user flag a wrong answer for the developers.
+function reportBlock(question, answer) {
+  const box = el("div", { className: "report" });
+  const open = el("button", { type: "button", className: "link-button", textContent: "Report a problem with this answer" });
+  open.onclick = () => {
+    const comment = el("textarea", { rows: 2, placeholder: "What looks wrong? (optional)" });
+    const send = el("button", { type: "button", className: "secondary", textContent: "Send report" });
+    send.onclick = async () => {
+      send.disabled = true;
+      try {
+        await fetch("/api/report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, answer, comment: comment.value }),
+        });
+        box.replaceChildren(el("p", { className: "note", textContent: "Thanks. The report was saved for the developers to review." }));
+      } catch {
+        send.disabled = false;
+        box.append(el("p", { className: "note", textContent: "Could not send the report. Please try again." }));
+      }
+    };
+    box.replaceChildren(comment, send);
+  };
+  box.append(open);
+  return box;
+}
+
+function renderAnswer(a, question) {
   const parts = [];
 
+  parts.push(el("span", {
+    className: `badge ${a.source}`,
+    textContent: a.source === "ai" ? "AI answer" : "Basic answer",
+  }));
+  if (a.notice) parts.push(el("p", { className: "notice", textContent: a.notice }));
   if (a.safety) parts.push(el("p", { className: "safety", role: "alert", textContent: a.safety }));
   if (a.vehicle) parts.push(el("p", { className: "meta", textContent:
     a.vehicle.label + (a.vehicle.mileageKm != null ? ` · ${km(a.vehicle.mileageKm)}` : "") }));
@@ -129,6 +161,7 @@ function renderAnswer(a) {
   }
 
   if (a.sources && a.sources.length) parts.push(el("h4", { textContent: "Sources" }), linkList(a.sources));
+  parts.push(reportBlock(question, a));
   parts.push(el("p", { className: "fine", textContent: a.disclaimer }));
 
   const box = document.getElementById("answer");
@@ -140,16 +173,23 @@ document.getElementById("ask-form").addEventListener("submit", async (event) => 
   event.preventDefault();
   const question = document.getElementById("question").value;
   const box = document.getElementById("answer");
+  const button = event.target.querySelector("button[type=submit]");
+  button.disabled = true;
+  button.textContent = "Checking… (can take up to a minute)";
+  box.replaceChildren(el("p", { className: "note", textContent: "Looking up your vehicle, the service schedule and local prices…" }));
+  box.hidden = false;
   try {
     const res = await fetch("/api/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question }),
     });
-    renderAnswer(await res.json());
+    renderAnswer(await res.json(), question);
   } catch {
     box.textContent = "Could not reach the server. Is it running?";
-    box.hidden = false;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Check it";
   }
 });
 
