@@ -21,6 +21,14 @@
     <section class="card" id="vehicle-card" aria-labelledby="vehicle-title">
       <h2 id="vehicle-title">My vehicle</h2>
       <p id="vehicle-line" class="muted">Loading…</p>
+      <form id="mileage-form" class="inline-form" novalidate>
+        <label for="mileage">Current mileage (km)</label>
+        <div class="row">
+          <input id="mileage" name="mileage" inputmode="numeric" autocomplete="off" placeholder="e.g. 7500">
+          <button type="submit" class="secondary">Update</button>
+        </div>
+        <p id="mileage-msg" class="field-msg" role="status" hidden></p>
+      </form>
     </section>
 
     <section class="card" aria-labelledby="ask-title">
@@ -29,6 +37,7 @@
         <label for="question" class="sr-only">Your question</label>
         <textarea id="question" rows="3"
           placeholder='e.g. "The dealer quoted $170 to replace my air filters. Is that fair?"'></textarea>
+        <p id="question-msg" class="field-msg error" role="alert" hidden></p>
         <button type="submit">Check it</button>
       </form>
       <div id="answer" class="answer" hidden></div>
@@ -40,6 +49,29 @@
       <ul id="history-done" class="history"></ul>
       <h3>Recommended, not done yet</h3>
       <ul id="history-recommended" class="history"></ul>
+
+      <details id="add-item">
+        <summary>Add a service item</summary>
+        <form id="item-form" class="stack-form" novalidate>
+          <label>What was done or recommended
+            <input name="item" maxlength="120" placeholder="e.g. Brake pad replacement (front)"></label>
+          <div class="row">
+            <label>Date <input name="date" type="date"></label>
+            <label>Mileage (km) <input name="mileageKm" inputmode="numeric" placeholder="e.g. 7500"></label>
+          </div>
+          <div class="row">
+            <label>Cost ($) <input name="cost" inputmode="decimal" placeholder="e.g. 94.50"></label>
+            <label>Status
+              <select name="status">
+                <option value="done">Done</option>
+                <option value="recommended">Recommended, not done</option>
+              </select></label>
+          </div>
+          <label>Shop (optional) <input name="shop" maxlength="80" placeholder="e.g. Sample Toyota Dealer"></label>
+          <p id="item-msg" class="field-msg" role="status" hidden></p>
+          <button type="submit">Save item</button>
+        </form>
+      </details>
     </section>
   </main>
 

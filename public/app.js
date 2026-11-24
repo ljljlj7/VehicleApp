@@ -33,10 +33,12 @@ function historyRow(entry) {
 
 async function loadGarage() {
   const res = await fetch("/api/garage");
-  const { vehicle, history } = await res.json();
+  const { vehicle, history: saved } = await res.json();
+  const history = [...saved].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
 
   document.getElementById("vehicle-line").textContent =
     `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim} · ${km(vehicle.mileageKm)}`;
+  document.getElementById("mileage").placeholder = `e.g. ${vehicle.mileageKm}`;
 
   const done = document.getElementById("history-done");
   const recommended = document.getElementById("history-recommended");
@@ -169,9 +171,77 @@ function renderAnswer(a, question) {
   box.hidden = false;
 }
 
+// --- Messages and saving -----------------------------------------------------
+
+function showMsg(id, text, kind) {
+  const msg = document.getElementById(id);
+  msg.textContent = text;
+  msg.className = `field-msg ${kind}`;
+  msg.hidden = !text;
+}
+
+// Send JSON to the server. Always resolves to { ok, data } with a readable error.
+async function sendJson(url, method, body) {
+  try {
+    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, data: res.ok ? data : { error: data.error || "Something went wrong. Please try again." } };
+  } catch {
+    return { ok: false, data: { error: "Could not reach the server. Check your connection and try again." } };
+  }
+}
+
+// Same rule as the server: whole numbers only, commas or spaces allowed.
+const isKm = (text) => /^\d+$/.test(String(text).trim().replace(/[,\s]/g, ""));
+const KM_MSG = "Mileage must be a number in km, using digits only (for example 7500).";
+
+document.getElementById("mileage-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const input = document.getElementById("mileage");
+  if (!isKm(input.value)) {
+    showMsg("mileage-msg", KM_MSG, "error");
+    input.focus();
+    input.select();
+    return;
+  }
+  const { ok, data } = await sendJson("/api/vehicle/mileage", "PUT", { mileageKm: input.value });
+  if (!ok) return showMsg("mileage-msg", data.error, "error");
+  showMsg("mileage-msg", "Mileage saved.", "ok");
+  await loadGarage();
+});
+
+document.getElementById("item-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.target;
+  const values = Object.fromEntries(new FormData(form));
+  // Quick checks in the browser; the server checks everything again.
+  const problems = [
+    [!values.item.trim(), "item", "Please describe the service or repair."],
+    [!values.date, "date", "Please pick the date of the service."],
+    [!isKm(values.mileageKm), "mileageKm", KM_MSG],
+  ].find(([bad]) => bad);
+  if (problems) {
+    showMsg("item-msg", problems[2], "error");
+    form.elements[problems[1]].focus();
+    return;
+  }
+  const { ok, data } = await sendJson("/api/history", "POST", values);
+  if (!ok) return showMsg("item-msg", data.error, "error");
+  form.reset();
+  showMsg("item-msg", `Saved "${data.entry.item}" to your history.`, "ok");
+  await loadGarage();
+});
+
 document.getElementById("ask-form").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const question = document.getElementById("question").value;
+  const questionBox = document.getElementById("question");
+  const question = questionBox.value.trim();
+  if (!question) {
+    showMsg("question-msg", "Please type your question or paste the quote first.", "error");
+    questionBox.focus();
+    return;
+  }
+  showMsg("question-msg", "", "error");
   const box = document.getElementById("answer");
   const button = event.target.querySelector("button[type=submit]");
   button.disabled = true;
@@ -179,14 +249,13 @@ document.getElementById("ask-form").addEventListener("submit", async (event) => 
   box.replaceChildren(el("p", { className: "note", textContent: "Looking up your vehicle, the service schedule and local prices…" }));
   box.hidden = false;
   try {
-    const res = await fetch("/api/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
-    });
-    renderAnswer(await res.json(), question);
-  } catch {
-    box.textContent = "Could not reach the server. Is it running?";
+    const { ok, data } = await sendJson("/api/check", "POST", { question });
+    if (ok) {
+      renderAnswer(data, question);
+    } else {
+      box.hidden = true;
+      showMsg("question-msg", data.error, "error");
+    }
   } finally {
     button.disabled = false;
     button.textContent = "Check it";

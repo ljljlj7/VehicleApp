@@ -159,3 +159,23 @@ button:disabled { opacity: 0.7; cursor: progress; }
 .link-button { background: none; color: var(--muted); width: auto; padding: 0; margin: 0; font-weight: 400; font-size: 0.82rem; text-decoration: underline; }
 .report textarea { margin-top: 4px; }
 .report .secondary { width: auto; }
+
+/* --- M3: forms and messages --- */
+.field-msg { margin: 6px 0 0; font-size: 0.85rem; }
+.field-msg.error { color: #b42318; }
+.field-msg.ok { color: var(--done); }
+input, select {
+  width: 100%; font: inherit; padding: 9px 11px;
+  border: 1px solid #d0d5dd; border-radius: 10px; background: #fff;
+}
+input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.inline-form { margin-top: 10px; }
+.inline-form label, .stack-form label { display: block; font-size: 0.85rem; color: var(--muted); }
+.stack-form label input, .stack-form label select { margin-top: 3px; color: var(--text); }
+.row { display: flex; gap: 8px; align-items: flex-end; }
+.row > * { flex: 1; }
+.inline-form .row button { flex: 0 0 auto; width: auto; margin-top: 0; }
+.stack-form { display: grid; gap: 10px; margin-top: 10px; }
+.stack-form button { margin-top: 0; }
+#add-item { margin-top: 14px; border-top: 1px solid #eaecf0; padding-top: 10px; }
+#add-item summary { cursor: pointer; font-weight: 600; color: var(--accent); }
