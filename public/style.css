@@ -1,0 +1,112 @@
+/* Mobile-first: designed for a phone, widens gently on bigger screens. */
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #1c2430;
+  --muted: #667085;
+  --accent: #1f6feb;
+  --done: #1a7f37;
+  --todo: #b35900;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.top {
+  background: var(--text);
+  color: #fff;
+  padding: 18px 16px 14px;
+}
+.top h1 { margin: 0; font-size: 1.4rem; letter-spacing: 0.2px; }
+.top .tag { margin: 2px 0 0; opacity: 0.75; font-size: 0.9rem; }
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: #eef1f5;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+.card h2 { margin: 0 0 10px; font-size: 1.05rem; }
+.card h3 { margin: 14px 0 6px; font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+.muted { color: var(--muted); }
+
+textarea {
+  width: 100%;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  resize: vertical;
+}
+textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.05); }
+
+.answer {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #eef4ff;
+}
+
+.history { list-style: none; margin: 0; padding: 0; }
+.history li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #eaecf0;
+}
+.history li:first-child { border-top: 0; }
+.history .meta { font-size: 0.8rem; color: var(--muted); }
+.history .cost { white-space: nowrap; font-weight: 600; }
+#history-done .cost { color: var(--done); }
+#history-recommended .cost { color: var(--todo); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+@media (min-width: 700px) {
+  .top { padding: 22px 24px 16px; }
+  main { padding: 20px; }
+}

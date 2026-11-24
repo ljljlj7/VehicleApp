@@ -32,6 +32,11 @@ No preference. Propose the simplest stack for this product and wait for approval
 ## Commands
 After the app first runs, write the install, run and test commands here and keep them current.
 
+- Needs: Node.js LTS (`winget install --id OpenJS.NodeJS.LTS -e`)
+- Install: `npm install`
+- Run: `npm start`, then open http://localhost:3000 (stop with Ctrl+C)
+- Test: no automated tests yet; click through acceptance-test.md in the running app
+
 ## Data and secrets
 - Never write an API key, password or token into code, chat or a file that is saved to GitHub. Read keys from environment variables.
 - Keep .env in .gitignore. Maintain .env.example with the key names and no values.

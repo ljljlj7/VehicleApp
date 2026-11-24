@@ -1,0 +1,41 @@
+{
+  "_note": "MADE-UP SAMPLE DATA for a course prototype. No real people, vehicles or invoices.",
+  "vehicle": {
+    "nickname": "Demo RAV4",
+    "year": 2025,
+    "make": "Toyota",
+    "model": "RAV4",
+    "trim": "LE",
+    "mileageKm": 7000
+  },
+  "history": [
+    {
+      "id": 1,
+      "date": "2025-06-14",
+      "mileageKm": 1600,
+      "item": "Complimentary inspection",
+      "status": "done",
+      "cost": 0,
+      "shop": "Sample Toyota Dealer"
+    },
+    {
+      "id": 2,
+      "date": "2025-11-02",
+      "mileageKm": 6500,
+      "item": "Oil and filter change, tire rotation",
+      "status": "done",
+      "cost": 94.5,
+      "shop": "Sample Toyota Dealer"
+    },
+    {
+      "id": 3,
+      "date": "2025-11-02",
+      "mileageKm": 6500,
+      "item": "Replace cabin and engine air filters",
+      "status": "recommended",
+      "cost": 170,
+      "shop": "Sample Toyota Dealer"
+    }
+  ],
+  "reports": []
+}

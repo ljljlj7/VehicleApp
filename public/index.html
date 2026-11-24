@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auto-Mobile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Auto-Mobile</h1>
+    <p class="tag">Your maintenance minder</p>
+  </header>
+
+  <main>
+    <p class="disclaimer" role="note">
+      Course prototype using made-up sample data. Auto-Mobile gives general information only, not professional advice.
+      For anything safety related, check with a qualified technician.
+    </p>
+
+    <section class="card" id="vehicle-card" aria-labelledby="vehicle-title">
+      <h2 id="vehicle-title">My vehicle</h2>
+      <p id="vehicle-line" class="muted">Loading…</p>
+    </section>
+
+    <section class="card" aria-labelledby="ask-title">
+      <h2 id="ask-title">Ask about a quote or service</h2>
+      <form id="ask-form">
+        <label for="question" class="sr-only">Your question</label>
+        <textarea id="question" rows="3"
+          placeholder='e.g. "The dealer quoted $170 to replace my air filters. Is that fair?"'></textarea>
+        <button type="submit">Check it</button>
+      </form>
+      <div id="answer" class="answer" hidden></div>
+    </section>
+
+    <section class="card" aria-labelledby="history-title">
+      <h2 id="history-title">Service history</h2>
+      <h3>Done</h3>
+      <ul id="history-done" class="history"></ul>
+      <h3>Recommended, not done yet</h3>
+      <ul id="history-recommended" class="history"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
