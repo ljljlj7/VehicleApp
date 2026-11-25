@@ -143,35 +143,63 @@ const fmtMonth = (d) => new Date(toTime(d)).toLocaleDateString("en-CA", { month:
 
 // The service timeline, like Toyota's: the regular service visits (every 8,000 km from the
 // next one), each listing the other items that fall due by that visit.
+// Skipped work does not pile up: everything already overdue goes into one "do now" card, and
+// the later visits count on from today's mileage, as if that work is done now. Once it is logged
+// as done, the visits count from the km where it was really done.
 function buildTimeline({ schedule, dueItems, mileageKm, today, rate, visits = 10 }) {
   const visitEntry = schedule.items.find((i) => !i.partOf && i.id === "inspection");
   const next = dueItems.find((i) => i.id === "inspection");
   if (!visitEntry || !next) return [];
-  const link = (entry) => pageLink(schedule, entry.detailsPage ?? entry.page);
-  const kms = Array.from({ length: visits }, (_, k) => next.dueKm + k * visitEntry.everyKm);
+  const entryOf = (id) => schedule.items.find((e) => e.id === id);
+  const card = (e, extra = {}) => ({
+    id: e.id, name: e.short || e.name, description: e.description || e.note || null,
+    link: pageLink(schedule, e.detailsPage ?? e.page), ...extra,
+  });
+  const isOverdue = (i) => i.kmLeft != null && i.kmLeft <= 0;
+  // Where each item is next due on the timeline: overdue items count from today's mileage.
+  const firstKm = (i) => (isOverdue(i) ? mileageKm + entryOf(i.id).everyKm : i.dueKm);
 
-  return kms.map((km, k) => {
-    const after = k === 0 ? -Infinity : kms[k - 1];
+  const cards = [];
+  const overdue = dueItems.filter(isOverdue)
+    .sort((a, b) => (a.id === "inspection" ? -1 : b.id === "inspection" ? 1 : a.dueKm - b.dueKm));
+  if (overdue.length) {
+    const sinceKm = Math.min(...overdue.map((i) => i.dueKm));
+    cards.push({
+      km: sinceKm,
+      kmLeft: sinceKm - mileageKm,
+      status: "overdue",
+      // How many of the regular service visits the car has driven past without one.
+      missedVisits: isOverdue(next) ? Math.floor((mileageKm - next.dueKm) / visitEntry.everyKm) + 1 : 0,
+      dateLabel: null,
+      inLabel: null,
+      items: overdue.map((i) => card(entryOf(i.id), { overdueKm: mileageKm - i.dueKm })),
+      source: pageLink(schedule, visitEntry.page),
+    });
+  }
+
+  const startKm = firstKm(next);
+  const kms = Array.from({ length: visits - cards.length }, (_, k) => startKm + k * visitEntry.everyKm);
+  kms.forEach((km, k) => {
+    const after = k === 0 ? mileageKm : kms[k - 1];
     const extras = dueItems.filter((i) => i.id !== "inspection").filter((i) => {
-      const every = schedule.items.find((e) => e.id === i.id).everyKm;
-      for (let x = i.dueKm; x <= km; x += every) if (x > after) return true;
+      const every = entryOf(i.id).everyKm;
+      for (let x = firstKm(i); x <= km; x += every) if (x > after) return true;
       return false;
     });
-    const items = [visitEntry, ...extras.map((i) => schedule.items.find((e) => e.id === i.id))]
-      .map((e) => ({ id: e.id, name: e.short || e.name, description: e.description || e.note || null, link: link(e) }));
     const kmLeft = km - mileageKm;
     const days = rate ? Math.max(0, Math.round(kmLeft / rate)) : null;
     const date = today && days != null ? addDays(today, days) : null;
-    return {
+    cards.push({
       km,
       kmLeft,
-      status: k === 0 ? next.status : "later",
+      status: k === 0 ? "next" : "later",
       dateLabel: date ? fmtMonth(date) : null,
       inLabel: k === 0 && days != null ? inTime(days) : null,
-      items,
+      items: [visitEntry, ...extras.map((i) => entryOf(i.id))].map((e) => card(e)),
       source: pageLink(schedule, visitEntry.page),
-    };
+    });
   });
+  return cards;
 }
 
 // Everything the main screen needs about the garage car.

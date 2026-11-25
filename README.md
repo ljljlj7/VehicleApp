@@ -64,7 +64,7 @@ If it asks you to sign in to GitHub, do that in the browser window it opens.
 ## Testing it
 
 1. Press **Reset demo** (top right) before you start, so the car is at 7,000 km on Nov 25, 2026 with the sample history.
-2. Work through the tests in [acceptance-test.md](acceptance-test.md) (T1–T17). What each test should show is written
+2. Work through the tests in [acceptance-test.md](acceptance-test.md) (T1–T18). What each test should show is written
    down in [test-results.md](test-results.md).
 3. Things that are normal, not bugs:
    - Answers say **"Basic answer"** with a yellow note that the AI is not set up. The AI part comes next (milestone M6);

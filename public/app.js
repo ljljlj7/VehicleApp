@@ -32,20 +32,28 @@ function openService(item, context) {
   document.getElementById("service-dialog").showModal();
 }
 
-function visitCard(v, i) {
-  const overdue = i === 0 && v.kmLeft <= 0;
-  const kind = i === 0 ? (overdue ? "overdue" : "next") : "later";
-  const label = i === 0 ? (overdue ? "Overdue" : "Next service") : "Later";
-  const dateText = overdue ? `Overdue by ${km(-v.kmLeft)}` : v.dateLabel ? `Est. ${v.dateLabel}` : "";
-  const context = [label, km(v.km), dateText].filter(Boolean).join(" · ");
+// A card's status comes from the server: "overdue" (everything missed, do now), "next" or "later".
+const overdueText = (n) => (n > 0 ? `Overdue by ${km(n)}` : "Due now");
+
+function visitCard(v) {
+  const kind = v.status;
+  const label = kind === "overdue" ? "Overdue: do now" : kind === "next" ? "Next service" : "Later";
+  const dateText = kind === "overdue" ? overdueText(-v.kmLeft) : v.dateLabel ? `Est. ${v.dateLabel}` : "";
+  const when = kind === "overdue" ? v.missedVisits > 1 && `${v.missedVisits} service visits missed`
+    : kind === "next" && v.inLabel && v.inLabel.replace(/^in /, "In ");
+  // In the overdue card, each item says how far overdue it is (when there is more than one).
+  const itemNote = (it) => kind === "overdue" && v.items.length > 1 && it.overdueKm != null && overdueText(it.overdueKm);
+  const context = (it) => kind === "overdue" ? [label, overdueText(it.overdueKm)].join(" · ")
+    : [label, km(v.km), dateText].filter(Boolean).join(" · ");
   return el("li", { className: `visit ${kind}` },
     el("div", { className: "visit-top" },
       el("p", { className: "visit-label", textContent: label }),
       el("p", { className: "visit-km", textContent: km(v.km) }),
       el("p", { className: "visit-date", textContent: dateText }),
-      i === 0 && !overdue && v.inLabel && el("p", { className: "visit-when", textContent: v.inLabel.replace(/^in /, "In ") })),
+      when && el("p", { className: "visit-when", textContent: when })),
     el("ul", { className: "visit-items" }, v.items.map((it) => el("li", {},
-      el("button", { type: "button", className: "service-link", textContent: it.name, onclick: () => openService(it, context) })))));
+      el("button", { type: "button", className: "service-link", textContent: it.name, onclick: () => openService(it, context(it)) }),
+      itemNote(it) && el("span", { className: "item-note", textContent: itemNote(it) })))));
 }
 
 function lastCard(last) {

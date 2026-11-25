@@ -189,6 +189,7 @@ main > * { min-width: 0; }
 }
 .service-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .visit-source { margin-top: auto; font-size: 0.8rem; color: var(--muted); }
+.item-note { display: block; font-size: 0.8rem; color: var(--danger); }
 /* Service pop-up */
 dialog {
   width: min(440px, calc(100vw - 32px));

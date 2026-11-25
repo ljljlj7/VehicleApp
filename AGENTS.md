@@ -40,7 +40,7 @@ After the app first runs, write the install, run and test commands here and keep
 - Update an existing copy: stop the app, `git checkout -- data/db.json`, `git pull`, `npm install`, start again.
 - Reset the sample data: the "Reset demo" button in the app (or `git checkout -- data/db.json`).
 - AI key (optional): local `.env` (copy `.env.example`), never uploaded; or GitHub → Settings → Codespaces → Secrets → `ANTHROPIC_API_KEY` for repository `ljljlj7/VehicleApp`, then restart the codespace. Without a key the app uses built-in rules.
-- Test: no automated tests; click through acceptance-test.md (T1–T17) in the running app; expected results are in test-results.md.
+- Test: no automated tests; click through acceptance-test.md (T1–T18) in the running app; expected results are in test-results.md.
 - Setting it up for a teammate to test: install and start only; do not change, commit or push project files.
 
 ## Data and secrets

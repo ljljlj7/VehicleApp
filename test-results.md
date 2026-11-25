@@ -3,6 +3,17 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Skipped services: 2026-11-25
+
+T18 in Chrome at 1280 px: "Correct mileage" to 24,200 km gave one "Overdue: do now" card (8,000 km, overdue by
+16,200 km, "3 service visits missed") listing the service visit (16,200 km overdue) and the oil change (1,857 km overdue);
+next service 32,200 km, then 40,200 and 48,200; no cards for the 16,000 and 24,000 km visits the car drove past. After
+adding the service visit as done, only the oil change was left in the overdue card; after adding the oil change the card
+was gone and the timeline counted from 24,200 km. Same after each reload. Also checked at 400 px (phone): the card fits.
+T4, T7–T12, T14–T17 re-run: pass; the sample timeline (next service 8,000 km) is unchanged.
+Note: after a big mileage correction the estimated dates are early, because the app averages the jump into the driving
+speed (here about 5,000 km a week). That is how "Correct mileage" already worked.
+
 ## Reset demo button: 2026-11-25
 
 T17 in Chrome at 1280 px: after two simulated weeks and an added service visit (car at 15,000 km, Sep 1, 2027),
