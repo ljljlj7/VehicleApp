@@ -11,6 +11,7 @@
         {
           "id": "inspection",
           "name": "Service visit (inspection and tire rotation)",
+          "short": "Inspection & tire rotation",
           "everyKm": 8000,
           "page": 1,
           "detailsPage": 3,
@@ -19,6 +20,7 @@
         {
           "id": "oil_change",
           "name": "Engine oil and filter replacement",
+          "short": "Oil & filter",
           "everyKm": 16000,
           "page": 1,
           "detailsPage": 3
@@ -26,6 +28,7 @@
         {
           "id": "major_inspection",
           "name": "Detailed inspection: measure brakes, 12-volt battery check",
+          "short": "Brake measurement & battery check",
           "everyKm": 32000,
           "page": 1,
           "detailsPage": 4,
@@ -34,12 +37,14 @@
         {
           "id": "brake_fluid",
           "name": "Brake fluid replacement",
+          "short": "Brake fluid",
           "everyKm": 48000,
           "page": 1
         },
         {
           "id": "transfer_case_fluid",
           "name": "Transfer case fluid replacement (AWD)",
+          "short": "Transfer case fluid (AWD)",
           "everyKm": 48000,
           "page": 1
         },
@@ -97,12 +102,14 @@
         {
           "id": "inspection",
           "name": "Service visit (inspection and tire rotation)",
+          "short": "Inspection & tire rotation",
           "everyKm": 8000,
           "page": null
         },
         {
           "id": "oil_change",
           "name": "Oil and filter change",
+          "short": "Oil & filter",
           "everyKm": 16000,
           "page": null
         },

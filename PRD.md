@@ -50,7 +50,7 @@ The app connects to the car, so it knows the mileage without the user typing it 
 - F3 user interface that allows information for vehicles to be entered to reference manuals and recommended service. Based on mileage input.
 - F4 sourced links to any information presented as facts
 - F5 logged history of vehicle to use as a reference source. New entries are picked from a list of services, so each one updates what is due.
-- F6 "What's due" panel on the main screen: due now, and next items with mileage and estimated date. Items are due by distance (km) only; the date is an estimate from how much the owner drives. (Prototype simplification: Toyota's "every 6 months" time limit is not used, so low-mileage drivers may be told later than Toyota requires.)
+- F6 Service timeline on the main screen: the last service, the next service visit (highlighted, red when overdue) and later visits, each with its km, estimated date and what is included. Items are due by distance (km) only; the date is an estimate from how much the owner drives. (Prototype simplification: Toyota's "every 6 months" time limit is not used, so low-mileage drivers may be told later than Toyota requires.)
 - F7 Simulated car connection: mileage readings come from sample data and the screen says "Connected car (simulated)". A "Simulate a week of driving" button moves the simulated date forward and adds kilometres, for the demo. The user can still correct the mileage by hand.
 - F8 Mileage prediction: the app estimates when each next item will be due from the average distance driven.
 - F9 The AI gets the app's context: current mileage, the due list, the schedule and the service history. It looks things up in the owner's manual first and searches the web only for prices, DIY guides and owner forum posts.
@@ -68,7 +68,7 @@ The app connects to the car, so it knows the mileage without the user typing it 
 - the "severe driving conditions" schedule (towing, dusty roads, short trips). Normal conditions only.
 
 ### Look and layout
-Works on phone, clean and modern with simple trendy look with no major clutter and smooth user experience flow.
+Desktop first (the app is mainly used on a computer), and still works on a phone. Clean and modern with simple trendy look with no major clutter and smooth user experience flow. The car and its mileage sit in one top bar; the main view is a service timeline like Toyota's (last service, next service highlighted, later services by km with an estimated date); checking a dealer recommendation and the service history sit side by side below.
 
 ## 5. AI in the product
 **Role.** Agentic. The AI takes several steps or uses tools on its own.

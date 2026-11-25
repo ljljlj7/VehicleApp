@@ -1,70 +1,91 @@
-// Browser logic: load the sample vehicle and history, send questions to the
-// server, and show the answer with follow-up choices.
+// Browser logic: show the car, its service timeline and history; send questions to the
+// server and show the answer with follow-up choices.
 
 const money = (n) => "$" + Number(n).toFixed(2);
 const range = (r) => (r.low === r.high ? money(r.low) : `${money(r.low)} – ${money(r.high)}`);
 const km = (n) => Number(n).toLocaleString("en-CA") + " km";
+const shortDate = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
 // Small helper to build elements safely (textContent avoids injecting HTML).
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
   Object.assign(node, props);
-  node.append(...children.filter((c) => c != null && c !== false));
+  node.append(...children.flat().filter((c) => c != null && c !== false && c !== ""));
   return node;
 }
-
-function linkList(links) {
-  return el("ul", { className: "links" },
-    ...links.map((l) => el("li", {}, el("a", { href: l.url, target: "_blank", rel: "noopener", textContent: l.label }))));
-}
+const extLink = (l, text = l.label) => el("a", { href: l.url, target: "_blank", rel: "noopener", textContent: text });
 
 function plainList(items) {
-  return el("ul", { className: "plain" }, ...items.map((t) => el("li", { textContent: t })));
+  return el("ul", { className: "plain" }, items.map((t) => el("li", { textContent: t })));
 }
 
-// Build one history row.
-function historyRow(entry) {
+// --- The car, the timeline and the history -----------------------------------
+
+// One service visit in the timeline (Toyota-style card).
+function visitCard(v, index) {
+  const label = index === 0
+    ? (v.status === "overdue" ? "Overdue" : "Next service")
+    : "Later";
+  const overdue = index === 0 && v.kmLeft <= 0;
+  const cls = index === 0 ? (v.status === "overdue" ? "visit overdue" : "visit next") : "visit";
+  return el("li", { className: cls },
+    el("div", { className: "visit-top" },
+      el("p", { className: "visit-label", textContent: label }),
+      el("p", { className: "visit-km", textContent: km(v.km) }),
+      el("p", { className: "visit-date", textContent: overdue ? `Overdue by ${km(-v.kmLeft)}` : v.dateLabel ? `Est. ${v.dateLabel}` : "" }),
+      index === 0 && !overdue && v.inLabel && el("p", { className: "visit-when", textContent: v.inLabel.replace(/^in /, "In ") })),
+    el("div", { className: "visit-body" },
+      el("ul", { className: "visit-items" }, v.items.map((i) => el("li", {}, el("a", {
+        href: i.link.url, target: "_blank", rel: "noopener", textContent: i.name, title: `What's included: ${i.link.label}` }))))));
+}
+
+// The last service from the history, as the first card.
+function lastCard(last) {
+  return el("li", { className: "visit past" },
+    el("div", { className: "visit-top" },
+      el("p", { className: "visit-label", textContent: "Last service" }),
+      el("p", { className: "visit-km", textContent: km(last.km) }),
+      el("p", { className: "visit-date", textContent: last.dateLabel })),
+    el("div", { className: "visit-body" },
+      el("ul", { className: "visit-items" }, el("li", { textContent: last.item })),
+      el("p", { className: "visit-source", textContent: `${last.shop} · ${money(last.cost)}` })));
+}
+
+function historyRow(h) {
   return el("li", {},
-    el("div", {},
-      el("div", { textContent: entry.item }),
-      el("div", { className: "meta", textContent: `${entry.date} · ${km(entry.mileageKm)} · ${entry.shop}` })),
-    el("div", { className: "cost", textContent: money(entry.cost) }));
-}
-
-// One item in the "What's due" panel.
-const DUE_LABEL = { overdue: "Overdue", soon: "Due now", later: "" };
-
-function dueItem(item) {
-  const source = el("a", { href: item.link.url, target: "_blank", rel: "noopener", textContent: item.link.label });
-  return el("li", { className: `due ${item.status}` },
-    el("div", { className: "service-head" },
-      el("strong", { textContent: item.name }),
-      DUE_LABEL[item.status] && el("span", { className: `pill ${item.status}`, textContent: DUE_LABEL[item.status] })),
-    el("div", { textContent: item.text.when }),
-    item.includes && item.status !== "later" && el("div", { className: "meta", textContent: `Includes: ${item.includes}` }),
-    el("div", { className: "meta" }, [item.text.expected, item.text.last].filter(Boolean).join(" · "), " · ", source));
+    el("span", { className: "what" }, h.item,
+      h.status === "recommended" && el("span", { className: "tag recommended", textContent: "Recommended" })),
+    el("span", { className: "cost", textContent: money(h.cost) }),
+    el("span", { className: "meta", textContent: `${shortDate(h.date)} · ${km(h.mileageKm)} · ${h.shop}` }));
 }
 
 function renderGarage(garage) {
-  const { vehicle, car, due } = garage;
-  const history = [...garage.history].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+  const { vehicle, car } = garage;
 
-  document.getElementById("vehicle-line").textContent =
-    `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim} · ${km(car.mileageKm)}`;
-  document.getElementById("car-line").textContent =
-    `Simulated date: ${car.todayLabel}` + (car.kmPerWeek != null ? ` · You drive about ${km(car.kmPerWeek)} a week` : "");
+  document.getElementById("vehicle-line").textContent = `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim}`;
+  document.getElementById("car-line").textContent = `${km(car.mileageKm)} · ${car.todayLabel}`;
   document.getElementById("mileage").placeholder = `e.g. ${car.mileageKm}`;
 
-  if (due) {
-    const now = due.items.filter((i) => i.status !== "later");
-    const next = due.items.filter((i) => i.status === "later").slice(0, 4);
-    document.getElementById("due-now").replaceChildren(now.length
-      ? el("ul", { className: "due-list" }, ...now.map(dueItem))
-      : el("p", { className: "note", textContent: "Nothing is due right now." }));
-    document.getElementById("due-next").replaceChildren(...next.map(dueItem));
-    document.getElementById("due-source").textContent =
-      "Due points are in km from Toyota's schedule. Dates are estimates based on how much you drive.";
-  }
+  const cards = [
+    garage.lastService && lastCard(garage.lastService),
+    ...garage.timeline.map(visitCard),
+  ].filter(Boolean);
+  const timeline = document.getElementById("timeline");
+  timeline.replaceChildren(...cards);
+  document.getElementById("due-source").textContent = car.kmPerWeek != null
+    ? `Dates are estimates from your driving (about ${km(car.kmPerWeek)} a week).`
+    : "";
+  const first = garage.timeline[0];
+  document.getElementById("timeline-source").replaceChildren(...(first
+    ? ["Source: ", extLink(first.source, `Toyota Canada maintenance schedule, 2025 RAV4 LE AWD (${first.source.label.replace("Toyota schedule ", "")})`),
+       ". Click a service to see what Toyota includes."]
+    : []));
+  // Start with the last service and the next one in view.
+  timeline.scrollLeft = 0;
+  updateScrollButtons();
+
+  const history = [...garage.history].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  document.getElementById("history-list").replaceChildren(...history.map(historyRow));
 
   const select = document.getElementById("service-select");
   const picked = select.value;
@@ -72,16 +93,26 @@ function renderGarage(garage) {
     el("option", { value: "", textContent: "Pick a service…" }),
     ...garage.serviceOptions.map((o) => el("option", { value: o.id, textContent: o.name })));
   select.value = picked;
-
-  const done = document.getElementById("history-done");
-  const recommended = document.getElementById("history-recommended");
-  done.replaceChildren(...history.filter((h) => h.status === "done").map(historyRow));
-  recommended.replaceChildren(...history.filter((h) => h.status === "recommended").map(historyRow));
 }
 
 async function loadGarage() {
   const res = await fetch("/api/garage");
   renderGarage(await res.json());
+}
+
+// Arrow buttons for the timeline (it also scrolls with a trackpad or touch).
+function updateScrollButtons() {
+  const t = document.getElementById("timeline");
+  document.getElementById("scroll-back").disabled = t.scrollLeft <= 2;
+  document.getElementById("scroll-forward").disabled = t.scrollLeft + t.clientWidth >= t.scrollWidth - 2;
+}
+document.getElementById("timeline").addEventListener("scroll", updateScrollButtons, { passive: true });
+window.addEventListener("resize", updateScrollButtons);
+for (const [id, dir] of [["scroll-back", -1], ["scroll-forward", 1]]) {
+  document.getElementById(id).addEventListener("click", () => {
+    const t = document.getElementById("timeline");
+    t.scrollBy({ left: dir * t.clientWidth * 0.8 });
+  });
 }
 
 // --- Rendering an answer ---------------------------------------------------
@@ -91,23 +122,23 @@ const IMPORTANCE = { safety: "Safety critical", important: "Important", routine:
 function serviceBlock(s) {
   const pastWork = s.history.length
     ? el("p", { className: "note", textContent:
-        "In your history: " + s.history.map((h) => `${h.status === "done" ? "done" : "recommended"} ${h.date} at ${km(h.mileageKm)} (${money(h.cost)})`).join("; ") })
+        "In your history: " + s.history.map((h) => `${h.status === "done" ? "done" : "recommended"} ${shortDate(h.date)} at ${km(h.mileageKm)} (${money(h.cost)})`).join("; ") })
     : null;
+  const fact = (label, ...value) => el("div", {}, el("dt", { textContent: label }), el("dd", {}, ...value));
 
   return el("div", { className: "service" },
     el("div", { className: "service-head" },
-      el("strong", { textContent: s.name }),
-      el("span", { className: `pill ${s.importance}`, textContent: IMPORTANCE[s.importance] })),
-    el("p", { textContent: s.importanceNote }),
-    s.timingNote && el("p", { className: "note", textContent: s.timingNote }),
+      el("h3", { textContent: s.name }),
+      el("span", { className: `importance ${s.importance}`, textContent: IMPORTANCE[s.importance] })),
+    s.timingNote && el("p", { textContent: s.timingNote }),
     pastWork,
     el("dl", { className: "facts" },
-      el("dt", { textContent: "Typical shop price" }), el("dd", { textContent: range(s.shopCost) }),
-      el("dt", { textContent: "Parts if you DIY" }), el("dd", { textContent: range(s.partsCost) }),
-      el("dt", { textContent: "DIY difficulty" }),
-      el("dd", {},
+      fact("Typical shop price", range(s.shopCost)),
+      fact("Parts if you DIY", range(s.partsCost)),
+      fact("DIY difficulty",
         el("span", { className: "dots", textContent: "●".repeat(s.diy.level) + "○".repeat(5 - s.diy.level) }),
-        ` ${s.diy.level}/5 · ${s.diy.label} · about ${s.diy.minutes} min`)));
+        ` ${s.diy.level}/5`)),
+    el("p", { className: "note", textContent: `${s.importanceNote} DIY: ${s.diy.label}, about ${s.diy.minutes} min.` }));
 }
 
 // Step 6–7 of the main task: the user picks what extra help they want.
@@ -124,9 +155,9 @@ function followUpBlock(answer) {
       ...(kind === "diy"
         ? [el("h4", { textContent: "Parts" }), plainList(s.parts),
            el("h4", { textContent: "Tools" }), plainList(s.tools),
-           el("h4", { textContent: "Guides" }), linkList(s.guides)]
+           el("h4", { textContent: "Guides" }), el("ul", { className: "links" }, s.guides.map((g) => el("li", {}, extLink(g))))]
         : [el("p", { textContent: `Typical shop price ${range(s.shopCost)}; parts ${range(s.partsCost)}.` }),
-           el("h4", { textContent: "Research pricing" }), linkList(s.pricing)]))));
+           el("h4", { textContent: "Research pricing" }), el("ul", { className: "links" }, s.pricing.map((p) => el("li", {}, extLink(p))))]))));
   };
 
   const btn = (label, kind) => el("button", { type: "button", className: "secondary", textContent: label, onclick: () => show(kind) });
@@ -155,10 +186,10 @@ function reportBlock(question, answer) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question, answer, comment: comment.value }),
         });
-        box.replaceChildren(el("p", { className: "note", textContent: "Thanks. The report was saved for the developers to review." }));
+        box.replaceChildren(el("p", { textContent: "Thanks. The report was saved for the developers to review." }));
       } catch {
         send.disabled = false;
-        box.append(el("p", { className: "note", textContent: "Could not send the report. Please try again." }));
+        box.append(el("p", { textContent: "Could not send the report. Please try again." }));
       }
     };
     box.replaceChildren(comment, send);
@@ -170,39 +201,32 @@ function reportBlock(question, answer) {
 function renderAnswer(a, question) {
   const parts = [];
 
-  parts.push(el("span", {
-    className: `badge ${a.source}`,
-    textContent: a.source === "ai" ? "AI answer" : "Basic answer",
-  }));
-  if (a.notice) parts.push(el("p", { className: "notice", textContent: a.notice }));
+  parts.push(el("div", { className: "answer-head" },
+    el("span", { className: `badge ${a.source}`, textContent: a.source === "ai" ? "AI answer" : "Basic answer" }),
+    a.notice && el("span", { className: "notice", textContent: a.notice })));
   if (a.safety) parts.push(el("p", { className: "safety", role: "alert", textContent: a.safety }));
-  if (a.vehicle) parts.push(el("p", { className: "meta", textContent:
-    a.vehicle.label + (a.vehicle.mileageKm != null ? ` · ${km(a.vehicle.mileageKm)}` : "") }));
-  parts.push(el("p", { textContent: a.message }));
+  parts.push(el("p", { className: "answer-message", textContent: a.message }));
 
   if (a.quote) {
     parts.push(el("div", { className: `verdict ${a.quote.verdict}` },
       el("strong", { textContent: `Quoted ${money(a.quote.quoted)} · typical ${range(a.quote)}` }),
-      el("div", { textContent: a.quote.text })));
-  } else if (a.typical) {
-    parts.push(el("p", { className: "note", textContent: `No price given. Typical shop price: ${range(a.typical)}.` }));
+      el("span", { textContent: a.quote.text })));
   }
 
   if (a.services) parts.push(...a.services.map(serviceBlock), followUpBlock(a));
-
   if (a.schedule) parts.push(plainList(a.schedule.items));
-
   if (a.ask) parts.push(plainList(a.ask));
 
   if (a.history) {
-    const list = (title, rows) => [el("h4", { textContent: title }),
-      rows.length ? el("ul", { className: "history" }, ...rows.map(historyRow)) : el("p", { className: "note", textContent: "None on file." })];
-    parts.push(...list("Confirmed work", a.history.done), ...list("Recommended, not done yet", a.history.recommended));
+    const list = (title, rows) => el("div", {}, el("h4", { textContent: title }),
+      rows.length ? el("ul", { className: "history" }, rows.map(historyRow)) : el("p", { className: "note", textContent: "None on file." }));
+    parts.push(list("Confirmed work", a.history.done), list("Recommended, not done yet", a.history.recommended));
   }
 
-  if (a.sources && a.sources.length) parts.push(el("h4", { textContent: "Sources" }), linkList(a.sources));
-  parts.push(reportBlock(question, a));
-  parts.push(el("p", { className: "fine", textContent: a.disclaimer }));
+  parts.push(el("div", { className: "answer-foot" },
+    a.sources && a.sources.length && el("p", { className: "sources" }, "Sources: ", a.sources.map((s) => extLink(s))),
+    el("p", { textContent: a.disclaimer }),
+    reportBlock(question, a)));
 
   const box = document.getElementById("answer");
   box.replaceChildren(...parts);
@@ -214,7 +238,7 @@ function renderAnswer(a, question) {
 function showMsg(id, text, kind) {
   const msg = document.getElementById(id);
   msg.textContent = text;
-  msg.className = `field-msg ${kind}`;
+  msg.className = `${msg.classList.contains("toast") ? "toast" : "field-msg"} ${kind}`;
   msg.hidden = !text;
 }
 
@@ -248,14 +272,17 @@ document.getElementById("mileage-form").addEventListener("submit", async (event)
   renderGarage(data);
 });
 
-// Demo: the simulated car drives a week; mileage, date and the due list update.
+// Demo: the simulated car drives a week; mileage, date and the timeline update.
+let toastTimer;
 document.getElementById("simulate-week").addEventListener("click", async (event) => {
-  const button = event.target;
+  const button = event.currentTarget;
   button.disabled = true;
   const { ok, data } = await sendJson("/api/car/simulate-week", "POST", {});
   button.disabled = false;
+  clearTimeout(toastTimer);
   if (!ok) return showMsg("simulate-msg", data.error, "error");
   showMsg("simulate-msg", `A week later: ${km(data.car.mileageKm)} on ${data.car.todayLabel}.`, "ok");
+  toastTimer = setTimeout(() => { document.getElementById("simulate-msg").hidden = true; }, 3000);
   renderGarage(data);
 });
 
@@ -302,7 +329,7 @@ document.getElementById("ask-form").addEventListener("submit", async (event) => 
   const button = event.target.querySelector("button[type=submit]");
   button.disabled = true;
   button.textContent = "Checking… (can take up to a minute)";
-  box.replaceChildren(el("p", { className: "note", textContent: "Looking up your vehicle, the service schedule and local prices…" }));
+  box.replaceChildren(el("p", { className: "note", textContent: "Looking up your car, the service schedule and local prices…" }));
   box.hidden = false;
   try {
     const { ok, data } = await sendJson("/api/check", "POST", { question });
@@ -319,6 +346,5 @@ document.getElementById("ask-form").addEventListener("submit", async (event) => 
 });
 
 loadGarage().catch(() => {
-  document.getElementById("vehicle-line").textContent =
-    "Could not load your vehicle. Is the server running?";
+  document.getElementById("vehicle-line").textContent = "Could not load your car. Is the server running?";
 });

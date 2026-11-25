@@ -34,11 +34,13 @@ function serviceOptions(vehicle) {
 
 // Everything the main screen shows: the car, what is due, the history.
 function garageView(db) {
-  const { car, due } = minder.garageStatus(db.vehicle, db.car, db.history);
+  const { car, due, timeline, lastService } = minder.garageStatus(db.vehicle, db.car, db.history);
   return {
     vehicle: { ...db.vehicle, mileageKm: car.mileageKm },
     car,
     due,
+    timeline,
+    lastService,
     history: db.history,
     serviceOptions: serviceOptions(db.vehicle),
   };

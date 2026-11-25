@@ -3,6 +3,33 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Redesign (desktop first, service timeline): 2026-11-25
+
+**Where:** laptop (Mac), http://localhost:3000, clicked through by a script in Chrome at **desktop width (1280 px)**;
+the layout was also checked at phone width (400 px). **AI:** off, so every question got a **Basic answer**.
+
+What changed for the tests: the car is in the top bar; "What's due" is now a **service timeline** (last service, next
+service, later services); the mileage box is behind **Correct mileage**; the history form is **Add a service** → **Save**.
+
+| ID | What we saw | Result |
+|----|-------------|--------|
+| T1 | Quote above the typical range; Toyota only inspects the air filter at each visit; source p. 3 | Pass (basic answer) |
+| T2 | "Due now: Service visit … Due at 8,000 km. At your driving, that's around Dec 30, 2026" | Pass (basic answer) |
+| T3 | Red safety warning, "do not leave them", disclaimer | Pass (basic answer) |
+| T4 | "Please type your question or paste the quote first." | Pass |
+| T5 | History split into confirmed and recommended | Pass (basic answer) |
+| T6 | Asks for trim and mileage | Pass (basic answer) |
+| T7 | Added "Engine oil and filter replacement" (7,100 km), reloaded: in the history, shown as the "Last service" card, timeline recalculated | Pass (a bug where the service list was empty was found and fixed in this run) |
+| T8 | "eight thousand" under Correct mileage refused | Pass |
+| T9 | Top bar: car, "Connected car (simulated)", 7,000 km · Nov 25, 2026. Timeline: last service 6,500 km (Nov 2026); next service 8,000 km, est. Dec 2026, in about 5 weeks; later visits to 80,000 km with what is included | Pass |
+| T10 | Simulate a week: 7,198 km · Dec 2, 2026; next service "in about 4 weeks"; kept after reload | Pass |
+| T11 | Source link under the timeline: "Toyota Canada maintenance schedule, 2025 RAV4 LE AWD (p. 1)", opens the PDF at page 1 | Pass |
+| T12 | "Toyota rotates the tires at every service visit. Next service visit: due at 8,000 km" | Pass (basic answer) |
+| T13 | Needs the AI (M6) | Not run |
+
+Screenshots: `11-T9-whats-due.jpg` (desktop main screen), `12-T12-is-it-due.jpg`, `13-T7-T8-service-list-and-mileage.jpg`,
+`14-phone-layout.jpg`. **Not run:** AI mode, a real phone, a person clicking through.
+
 ## M5b Real schedule: 2026-11-25
 
 **Where:** laptop (Mac), http://localhost:3000, clicked through by a script in Chrome at phone size (400 px wide).

@@ -139,12 +139,50 @@ function computeDue({ schedule, mileageKm, today = null, startDate = null, histo
     || (a.kmLeft ?? Infinity) - (b.kmLeft ?? Infinity));
 }
 
+const fmtMonth = (d) => new Date(toTime(d)).toLocaleDateString("en-CA", { month: "short", year: "numeric", timeZone: "UTC" });
+
+// The service timeline, like Toyota's: the regular service visits (every 8,000 km from the
+// next one), each listing the other items that fall due by that visit.
+function buildTimeline({ schedule, dueItems, mileageKm, today, rate, visits = 10 }) {
+  const visitEntry = schedule.items.find((i) => !i.partOf && i.id === "inspection");
+  const next = dueItems.find((i) => i.id === "inspection");
+  if (!visitEntry || !next) return [];
+  const link = (entry) => pageLink(schedule, entry.detailsPage ?? entry.page);
+  const kms = Array.from({ length: visits }, (_, k) => next.dueKm + k * visitEntry.everyKm);
+
+  return kms.map((km, k) => {
+    const after = k === 0 ? -Infinity : kms[k - 1];
+    const extras = dueItems.filter((i) => i.id !== "inspection").filter((i) => {
+      const every = schedule.items.find((e) => e.id === i.id).everyKm;
+      for (let x = i.dueKm; x <= km; x += every) if (x > after) return true;
+      return false;
+    });
+    const items = [visitEntry, ...extras.map((i) => schedule.items.find((e) => e.id === i.id))]
+      .map((e) => ({ id: e.id, name: e.short || e.name, link: link(e) }));
+    const kmLeft = km - mileageKm;
+    const days = rate ? Math.max(0, Math.round(kmLeft / rate)) : null;
+    const date = today && days != null ? addDays(today, days) : null;
+    return {
+      km,
+      kmLeft,
+      status: k === 0 ? next.status : "later",
+      dateLabel: date ? fmtMonth(date) : null,
+      inLabel: k === 0 && days != null ? inTime(days) : null,
+      items,
+      source: pageLink(schedule, visitEntry.page),
+    };
+  });
+}
+
 // Everything the main screen needs about the garage car.
 function garageStatus(vehicle, car, history) {
   const schedule = scheduleFor(vehicle.modelId);
   const reading = latestReading(car.readings);
   const mileageKm = reading ? reading.km : vehicle.mileageKm;
   const rate = kmPerDay(car.readings, car.today);
+  const dueItems = schedule ? computeDue({ schedule, mileageKm, today: car.today, startDate: vehicle.startDate, history, rate }) : [];
+  const last = history.filter((h) => h.status === "done")
+    .sort((a, b) => b.date.localeCompare(a.date) || b.mileageKm - a.mileageKm)[0] || null;
   return {
     car: {
       connection: car.connection,
@@ -153,9 +191,9 @@ function garageStatus(vehicle, car, history) {
       mileageKm,
       kmPerWeek: rate != null ? Math.round(rate * 7) : null,
     },
-    due: schedule
-      ? { source: schedule.source, items: computeDue({ schedule, mileageKm, today: car.today, startDate: vehicle.startDate, history, rate }) }
-      : null,
+    due: schedule ? { source: schedule.source, items: dueItems } : null,
+    timeline: schedule ? buildTimeline({ schedule, dueItems, mileageKm, today: car.today, rate }) : [],
+    lastService: last && { km: last.mileageKm, dateLabel: fmtMonth(last.date), item: last.item, cost: last.cost, shop: last.shop },
   };
 }
 
