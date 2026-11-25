@@ -1,8 +1,10 @@
 // Rule-based advisor (M1, no AI yet).
 // It reads the user's question, matches it against the sample knowledge base,
 // and builds a structured answer the page can show. In M2 the AI plugs in here.
+// Since M5a, "is it due?" comes from the minder (schedule + mileage + history).
 const fs = require("fs");
 const path = require("path");
+const minder = require("./minder");
 
 const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "knowledge.json"), "utf8"));
 
@@ -56,14 +58,34 @@ function historyFor(service, history) {
   return history.filter((h) => words.some((w) => h.item.toLowerCase().includes(w)));
 }
 
-function dueNote(service, mileageKm) {
-  if (!service.replaceEveryKm) return null;
-  const every = fmtKm(service.replaceEveryKm);
-  if (mileageKm == null) return `Usually due every ${every}. Tell us your mileage to check timing.`;
-  if (mileageKm < service.replaceEveryKm * 0.8) {
-    return `Usually due every ${every}. At ${fmtKm(mileageKm)} this is likely early, unless an inspection found it dirty or damaged.`;
+// What the schedule says about this service, worked out by the minder.
+function dueNote(service, due) {
+  if (!due) return "Tell us your mileage to check this against the maintenance schedule.";
+  const item = due.items.find((i) => i.id === service.id);
+  if (!item) return "This is not on the regular maintenance schedule; it depends on what an inspection finds.";
+  const { when, expected, last } = item.text;
+  const lead = {
+    overdue: "Overdue according to the schedule.",
+    soon: "Due soon according to the schedule.",
+    later: "Not due yet according to the schedule.",
+  }[item.status];
+  const advice = item.status === "later" ? "Unless an inspection found it worn, dirty or damaged, it can likely wait." : "";
+  return [lead, `${when}.`, expected && `${expected}.`, `${last}.`, advice].filter(Boolean).join(" ");
+}
+
+// Run the minder for the car in the question. For the saved car we also know its
+// history, its (simulated) date and how much it is driven; for any other car only km.
+function dueFor(vehicleId, mileageKm, garage, usingSaved) {
+  const schedule = minder.scheduleFor(vehicleId);
+  if (!schedule || mileageKm == null) return null;
+  if (usingSaved && garage.car) {
+    const rate = minder.kmPerDay(garage.car.readings, garage.car.today);
+    return {
+      source: schedule.source,
+      items: minder.computeDue({ schedule, mileageKm, today: garage.car.today, startDate: garage.vehicle.startDate, history: garage.history, rate }),
+    };
   }
-  return `Usually due every ${every}. At ${fmtKm(mileageKm)} it is likely due or close to due.`;
+  return { source: schedule.source, items: minder.computeDue({ schedule, mileageKm }) };
 }
 
 function brakeNote(service, mm) {
@@ -94,7 +116,7 @@ function serviceCard(s, ctx) {
     name: s.name,
     importance: s.importance,
     importanceNote: s.importanceNote,
-    timingNote: s.safety ? brakeNote(s, ctx.thicknessMm) : dueNote(s, ctx.mileageKm),
+    timingNote: s.safety ? brakeNote(s, ctx.thicknessMm) : dueNote(s, ctx.due),
     history: ctx.history ? historyFor(s, ctx.history) : [],
     shopCost: s.shopCost,
     partsCost: s.partsCost,
@@ -114,12 +136,11 @@ function check(question, garage) {
   const said = findVehicle(text);
   const saidMileage = findMileage(text);
   const services = findServices(text);
-  const base = { disclaimer: KB.disclaimer, sources: [KB.schedule.source] };
 
   // 1. Service history
   if (/history|past service|work (was )?done/.test(text)) {
     return {
-      ...base, kind: "history",
+      disclaimer: KB.disclaimer, kind: "history",
       vehicle: { label: vehicleLabel(garage.vehicle), mileageKm: garage.vehicle.mileageKm },
       message: "Here is the service history on file, split into confirmed work and recommendations.",
       history: {
@@ -130,14 +151,20 @@ function check(question, garage) {
     };
   }
 
-  // Which vehicle are we talking about? A vehicle named in the question wins over the saved one.
-  const usingSaved = !said;
-  const vehicle = said || garage.vehicle;
+  // Which vehicle are we talking about? A vehicle named in the question wins over the saved one,
+  // unless it is the saved car itself (same model and year).
+  const usingSaved = !said || (said.id === garage.vehicle.modelId && said.year === garage.vehicle.year);
+  const vehicle = usingSaved ? { ...garage.vehicle, trim: (said && said.trim) || garage.vehicle.trim } : said;
+  const vehicleId = usingSaved ? garage.vehicle.modelId : said.id;
   const mileageKm = saidMileage ?? (usingSaved ? garage.vehicle.mileageKm : null);
   const vLabel = vehicleLabel(vehicle);
+  const due = dueFor(vehicleId, mileageKm, garage, usingSaved);
+  const schedule = minder.scheduleFor(vehicleId);
+  const base = { disclaimer: KB.disclaimer, sources: schedule ? [schedule.source] : [] };
   const ctx = {
     vehicleText: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
     mileageKm,
+    due,
     thicknessMm: findThicknessMm(text),
     history: usingSaved ? garage.history : null,
   };
@@ -176,18 +203,17 @@ function check(question, garage) {
     };
   }
 
-  // 4. Next service for a known vehicle and mileage
-  if (wantsSchedule || said) {
-    const every = KB.schedule.everyKm;
-    const nextAtKm = Math.floor(mileageKm / every) * every + every;
-    const items = KB.schedule.items
-      .filter((i) => nextAtKm % i.everyKm === 0)
-      .map((i) => (i.service ? KB.services.find((s) => s.id === i.service).name : i.text));
+  // 4. What is due for a known vehicle and mileage (from the minder)
+  if ((wantsSchedule || said) && due) {
+    const LABEL = { overdue: "Overdue", soon: "Due now", later: "Next" };
+    const shown = [...due.items.filter((i) => i.status !== "later"), ...due.items.filter((i) => i.status === "later").slice(0, 3)];
+    const items = shown.map((i) => `${LABEL[i.status]}: ${i.name}. ${[i.text.when, i.text.expected].filter(Boolean).join(". ")}.`);
+    const dueNow = shown.filter((i) => i.status !== "later").length;
     return {
       ...base, kind: "schedule",
       vehicle: { label: vLabel, mileageKm },
-      message: `At ${fmtKm(mileageKm)}, your next scheduled service is at ${fmtKm(nextAtKm)} (${fmtKm(nextAtKm - mileageKm)} from now).`,
-      schedule: { nextAtKm, items },
+      message: `At ${fmtKm(mileageKm)}, ${dueNow ? `${dueNow === 1 ? "1 item is" : `${dueNow} items are`} due now` : "nothing is due yet"} on your ${vLabel}. Here is what the maintenance schedule says:`,
+      schedule: { items },
     };
   }
 

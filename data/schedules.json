@@ -1,0 +1,27 @@
+{
+  "_note": "SAMPLE maintenance schedules (placeholders) until M5b replaces them with the official Toyota maintenance guide. Each item: due every everyKm or everyMonths, whichever comes first. The ids match the services in knowledge.json and the services saved in the history.",
+  "vehicles": {
+    "rav4-2025": {
+      "label": "2025 Toyota RAV4",
+      "source": { "label": "Toyota owner's manuals and maintenance schedules (sample schedule: exact guide page to be linked in M5b)", "url": "https://www.toyota.com/owners/" },
+      "items": [
+        { "id": "tire_rotation", "name": "Tire rotation", "everyKm": 8000, "everyMonths": 6, "page": null },
+        { "id": "inspection", "name": "Multi-point inspection (brakes, fluids, belts, lights)", "everyKm": 8000, "everyMonths": 6, "page": null },
+        { "id": "oil_change", "name": "Oil and filter change", "everyKm": 16000, "everyMonths": 12, "page": null },
+        { "id": "cabin_air_filter", "name": "Cabin air filter replacement", "everyKm": 24000, "everyMonths": 24, "page": null },
+        { "id": "engine_air_filter", "name": "Engine air filter replacement", "everyKm": 48000, "everyMonths": null, "page": null }
+      ]
+    },
+    "rav4-hybrid-2026": {
+      "label": "2026 Toyota RAV4 Hybrid",
+      "source": { "label": "Toyota owner's manuals and maintenance schedules (sample schedule)", "url": "https://www.toyota.com/owners/" },
+      "items": [
+        { "id": "tire_rotation", "name": "Tire rotation", "everyKm": 8000, "everyMonths": 6, "page": null },
+        { "id": "inspection", "name": "Multi-point inspection (brakes, fluids, belts, lights)", "everyKm": 8000, "everyMonths": 6, "page": null },
+        { "id": "oil_change", "name": "Oil and filter change", "everyKm": 16000, "everyMonths": 12, "page": null },
+        { "id": "cabin_air_filter", "name": "Cabin air filter replacement", "everyKm": 24000, "everyMonths": 24, "page": null },
+        { "id": "engine_air_filter", "name": "Engine air filter replacement", "everyKm": 48000, "everyMonths": null, "page": null }
+      ]
+    }
+  }
+}

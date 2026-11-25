@@ -19,16 +19,31 @@
     </p>
 
     <section class="card" id="vehicle-card" aria-labelledby="vehicle-title">
-      <h2 id="vehicle-title">My vehicle</h2>
-      <p id="vehicle-line" class="muted">Loading…</p>
-      <form id="mileage-form" class="inline-form" novalidate>
-        <label for="mileage">Current mileage (km)</label>
-        <div class="row">
-          <input id="mileage" name="mileage" inputmode="numeric" autocomplete="off" placeholder="e.g. 7500">
-          <button type="submit" class="secondary">Update</button>
-        </div>
-        <p id="mileage-msg" class="field-msg" role="status" hidden></p>
-      </form>
+      <h2 id="vehicle-title">My car</h2>
+      <p id="vehicle-line">Loading…</p>
+      <p class="connected"><span class="dot" aria-hidden="true"></span> Connected car (simulated)</p>
+      <p id="car-line" class="muted"></p>
+      <button type="button" id="simulate-week" class="secondary">Simulate a week of driving</button>
+      <p id="simulate-msg" class="field-msg" role="status" hidden></p>
+      <details id="correct-mileage">
+        <summary>Correct the mileage</summary>
+        <form id="mileage-form" class="inline-form" novalidate>
+          <label for="mileage">Current mileage (km)</label>
+          <div class="row">
+            <input id="mileage" name="mileage" inputmode="numeric" autocomplete="off" placeholder="e.g. 7500">
+            <button type="submit" class="secondary">Update</button>
+          </div>
+          <p id="mileage-msg" class="field-msg" role="status" hidden></p>
+        </form>
+      </details>
+    </section>
+
+    <section class="card" aria-labelledby="due-title">
+      <h2 id="due-title">What's due</h2>
+      <div id="due-now"></div>
+      <h3>Coming up</h3>
+      <ul id="due-next" class="due-list"></ul>
+      <p id="due-source" class="fine"></p>
     </section>
 
     <section class="card" aria-labelledby="ask-title">
@@ -53,8 +68,10 @@
       <details id="add-item">
         <summary>Add a service item</summary>
         <form id="item-form" class="stack-form" novalidate>
-          <label>What was done or recommended
-            <input name="item" maxlength="120" placeholder="e.g. Brake pad replacement (front)"></label>
+          <label>Service
+            <select name="service" id="service-select"></select></label>
+          <label>Details <span id="details-hint">(optional)</span>
+            <input name="item" maxlength="120" placeholder="e.g. front pads only"></label>
           <div class="row">
             <label>Date <input name="date" type="date"></label>
             <label>Mileage (km) <input name="mileageKm" inputmode="numeric" placeholder="e.g. 7500"></label>

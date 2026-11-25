@@ -1,37 +1,59 @@
 {
-  "_note": "MADE-UP SAMPLE DATA for a course prototype. No real people, vehicles or invoices.",
+  "_note": "MADE-UP SAMPLE DATA for a course prototype. No real people, vehicles or invoices. The car connection is simulated: readings are sample data.",
   "vehicle": {
     "nickname": "Demo RAV4",
+    "modelId": "rav4-2025",
     "year": 2025,
     "make": "Toyota",
     "model": "RAV4",
     "trim": "LE",
+    "startDate": "2026-04-01",
     "mileageKm": 7000
+  },
+  "car": {
+    "connection": "simulated",
+    "today": "2026-11-25",
+    "readings": [
+      { "date": "2026-04-01", "km": 15 },
+      { "date": "2026-05-01", "km": 880 },
+      { "date": "2026-06-01", "km": 1750 },
+      { "date": "2026-06-14", "km": 2150 },
+      { "date": "2026-07-01", "km": 2700 },
+      { "date": "2026-08-01", "km": 3650 },
+      { "date": "2026-09-01", "km": 4600 },
+      { "date": "2026-10-01", "km": 5500 },
+      { "date": "2026-11-01", "km": 6450 },
+      { "date": "2026-11-02", "km": 6500 },
+      { "date": "2026-11-25", "km": 7000 }
+    ]
   },
   "history": [
     {
       "id": 1,
-      "date": "2025-06-14",
-      "mileageKm": 1600,
+      "date": "2026-06-14",
+      "mileageKm": 2150,
       "item": "Complimentary inspection",
+      "services": ["inspection"],
       "status": "done",
       "cost": 0,
       "shop": "Sample Toyota Dealer"
     },
     {
       "id": 2,
-      "date": "2025-11-02",
+      "date": "2026-11-02",
       "mileageKm": 6500,
       "item": "Oil and filter change, tire rotation",
+      "services": ["oil_change", "tire_rotation"],
       "status": "done",
       "cost": 94.5,
       "shop": "Sample Toyota Dealer"
     },
     {
       "id": 3,
-      "date": "2025-11-02",
+      "date": "2026-11-02",
       "mileageKm": 6500,
       "item": "Replace cabin and engine air filters",
+      "services": ["cabin_air_filter", "engine_air_filter"],
       "status": "recommended",
       "cost": 170,
       "shop": "Sample Toyota Dealer"

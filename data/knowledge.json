@@ -1,5 +1,5 @@
 {
-  "_note": "MADE-UP SAMPLE ESTIMATES for a course prototype (M1). Intervals, prices and difficulty are placeholders to be checked against the official Toyota manuals before any real use.",
+  "_note": "MADE-UP SAMPLE ESTIMATES for a course prototype (M1). Prices and difficulty are placeholders to be checked before any real use. Service intervals now live in schedules.json (M5a).",
   "vehicles": [
     {
       "id": "rav4-2025",
@@ -20,23 +20,11 @@
       "hybrid": true
     }
   ],
-  "schedule": {
-    "everyKm": 8000,
-    "source": { "label": "Toyota owner's manuals and maintenance schedules (placeholder: exact page to be linked)", "url": "https://www.toyota.com/owners/" },
-    "items": [
-      { "everyKm": 8000, "service": "tire_rotation" },
-      { "everyKm": 8000, "text": "Multi-point inspection (brakes, fluids, belts, lights)" },
-      { "everyKm": 16000, "service": "oil_change" },
-      { "everyKm": 24000, "service": "cabin_air_filter" },
-      { "everyKm": 48000, "service": "engine_air_filter" }
-    ]
-  },
   "services": [
     {
       "id": "engine_air_filter",
       "name": "Engine air filter replacement",
       "keywords": ["engine air filter", "engine filter", "air filter"],
-      "replaceEveryKm": 48000,
       "importance": "routine",
       "importanceNote": "Routine wear item. A dirty filter slowly lowers efficiency; it is rarely urgent.",
       "shopCost": { "low": 50, "high": 90 },
@@ -49,7 +37,6 @@
       "id": "cabin_air_filter",
       "name": "Cabin air filter replacement",
       "keywords": ["cabin air filter", "cabin filter", "cabin"],
-      "replaceEveryKm": 24000,
       "importance": "routine",
       "importanceNote": "Comfort item that filters the air you breathe inside. Not a safety or engine issue.",
       "shopCost": { "low": 50, "high": 100 },
@@ -76,7 +63,6 @@
       "id": "oil_change",
       "name": "Oil and filter change",
       "keywords": ["oil change", "oil and filter", "oil"],
-      "replaceEveryKm": 16000,
       "importance": "important",
       "importanceNote": "Keeps the engine healthy. Follow the interval; do not skip it.",
       "shopCost": { "low": 70, "high": 130 },
@@ -89,7 +75,6 @@
       "id": "tire_rotation",
       "name": "Tire rotation",
       "keywords": ["tire rotation", "rotate tires", "rotation"],
-      "replaceEveryKm": 8000,
       "importance": "routine",
       "importanceNote": "Evens out tire wear so tires last longer.",
       "shopCost": { "low": 25, "high": 60 },

@@ -3,6 +3,35 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## M5a Minder: 2026-11-25
+
+**Where:** laptop (Mac), http://localhost:3000, clicked through by a script in Chrome at phone size (400 px wide).
+**AI:** off (no API key), so every question got a **Basic answer**. **Schedule:** still the made-up sample schedule (M5b replaces it).
+
+| ID | What we did | What we saw | Result |
+|----|-------------|-------------|--------|
+| T1 | Pasted the $200 air filter quote | Quote above the typical $50–$90 range; "Not due yet according to the schedule. Due at 48,000 km"; history shows the dealer's $170 recommendation; DIY 1/5 | Pass (basic answer) |
+| T2 | Pasted "my 2025 toyota rav4 has 7000km…" | "1 item is due now": multi-point inspection at 10,150 km or by Dec 14, 2026; then tire rotation, oil change, cabin filter with km and dates | Pass (basic answer, sample schedule) |
+| T3 | Pasted the 1 mm brakes question | Red safety warning, "do not leave them", disclaimer | Pass (basic answer) |
+| T4 | Pressed "Check it" with an empty box | "Please type your question or paste the quote first." | Pass |
+| T5 | Pasted "tell me about my service history" | Confirmed work and recommended, split | Pass (basic answer) |
+| T6 | Pasted "I have a 2026 Toyota Rav4 Hybrid" | Asks for trim and mileage | Pass (basic answer) |
+| T7 | Added "Oil and filter change" from the new service list, then reloaded | Item still in history after reload, and the oil change's next due point moved to 23,100 km | Pass (note: the service is now picked from a list) |
+| T8 | Typed "eight thousand" under **Correct the mileage**, pressed Update | Refused: "Mileage must be a number in km…" | Pass (note: the mileage box is now under "Correct the mileage") |
+| T9 | Opened the app | "Connected car (simulated)", 7,000 km, about 198 km a week; "What's due" shows the inspection as due now, four items coming up with km and dates | Pass |
+| T10 | Pressed "Simulate a week of driving", then reloaded | 7,198 km on Dec 2, 2026; inspection now "in 12 days"; both still there after reload | Pass |
+| T11 | Checked the link on a due item | Opens toyota.com/owners, but **no page number** yet | Not passed yet: needs the real guide (M5b) |
+| T12 | Pasted "The dealer says I need a tire rotation, is it due?" | "Not due yet according to the schedule. Due at 14,500 km or by May 2, 2027… Last done Nov 2, 2026 at 6,500 km" | Pass (basic answer, sample schedule; guide page comes in M5b) |
+| T13 | – | Not built yet (owner's manual lookup, M5b/M6) | Not run |
+
+Also checked through the server: mileage lower than the last reading is refused; history dated after the car's
+simulated date is refused; "Other" without a description is refused. Screenshots: `11-T9-whats-due.jpg`,
+`12-T12-is-it-due.jpg`, `13-T7-T8-service-list-and-mileage.jpg`.
+
+**Not run:** AI mode (no key), a real phone, a person clicking through (Linus to do).
+
+## M4 Ship: 2026-11-24
+
 **Date:** 2026-11-24  **Version:** M3 code on `main` (commit 522fdce)  **Where:** laptop, http://localhost:3000
 
 ## Important: two answer modes

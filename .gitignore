@@ -1,3 +1,5 @@
 node_modules/
 .env
 npm-debug.log*
+# Toyota PDFs: too large for GitHub (115 MB) and owned by Toyota
+manuals/*.pdf

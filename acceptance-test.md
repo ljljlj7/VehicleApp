@@ -12,3 +12,8 @@ Each test is one action and the result we expect to see. A person runs every tes
 | T6 | I have a 2026 Toyota Rav4 Hybrid | Clarify trim and details and request mileage to pull appropriate official manuals and documents. | | |
 | T7 | add an item | when page is reloaded new data should be loaded | | |
 | T8 | Submit with letters instead of numbers for mileage | Should not be allowed, should redirect user to enter numerical input | | |
+| T9 | Open the app | Main screen shows "Connected car (simulated)", the current mileage, and a "What's due" list: due now, and next items with mileage and estimated date | | |
+| T10 | Press "Simulate a week of driving", then reload the page | Mileage and simulated date have gone up, the due list and dates have updated, and both are still there after the reload | | |
+| T11 | Click the source link on an item in the due list | Opens the Toyota maintenance guide, with the page number shown | | |
+| T12 | Paste "The dealer says I need a tire rotation, is it due?" | Answer says whether it is due at the current mileage according to the schedule (with guide page), and when it was last done | | |
+| T13 | Paste "What oil does my car need and how much?" | Answer gives the oil type and amount, citing the page of the Toyota owner's manual | | |

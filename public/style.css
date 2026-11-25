@@ -179,3 +179,24 @@ input:focus, select:focus { outline: 2px solid var(--accent); border-color: tran
 .stack-form button { margin-top: 0; }
 #add-item { margin-top: 14px; border-top: 1px solid #eaecf0; padding-top: 10px; }
 #add-item summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+
+/* --- M5a: connected car and "What's due" --- */
+#vehicle-card p { margin: 0; }
+#vehicle-card p.field-msg { margin-top: 6px; }
+#vehicle-line { font-weight: 600; }
+#vehicle-card .connected { margin-top: 6px; font-size: 0.85rem; color: var(--done); }
+.connected .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--done); margin-right: 4px; }
+#vehicle-card #car-line { margin-top: 2px; font-size: 0.85rem; }
+#correct-mileage { margin-top: 12px; }
+#correct-mileage summary { cursor: pointer; font-size: 0.85rem; color: var(--muted); }
+
+.due-list { list-style: none; margin: 0; padding: 0; }
+.due-list li { padding: 10px 0; border-top: 1px solid #eaecf0; }
+.due-list li:first-child { border-top: 0; }
+.due-list li > * + * { margin-top: 2px; }
+.due-list .meta a { color: var(--accent); }
+#due-now .due-list li { border-top: 0; margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: #fff6e0; }
+#due-now .due-list li.overdue { background: #fde8e8; }
+.pill.soon { background: #fff1e0; color: var(--todo); }
+.pill.overdue { background: #fde8e8; color: #9b1c1c; }
+#due-source { margin-top: 10px; }

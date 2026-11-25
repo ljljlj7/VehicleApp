@@ -5,10 +5,12 @@ const fs = require("fs");
 const path = require("path");
 const { check } = require("./advisor");
 const { askAI, isConfigured } = require("./ai");
+const minder = require("./minder");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, "data", "db.json");
+const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "knowledge.json"), "utf8"));
 
 // Read and write the saved data (made-up sample data only, see README).
 function readDb() {
@@ -21,10 +23,49 @@ function writeDb(db) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// The page asks for the demo owner's vehicle and service history here.
+// Services the user can pick when adding history: the car's schedule items, then other
+// known services (e.g. brakes), then "Other". Picking from a list lets the minder count it.
+function serviceOptions(vehicle) {
+  const schedule = minder.scheduleFor(vehicle.modelId);
+  const fromSchedule = schedule ? schedule.items.map((i) => ({ id: i.id, name: i.name })) : [];
+  const extra = KB.services.filter((s) => !fromSchedule.some((o) => o.id === s.id)).map((s) => ({ id: s.id, name: s.name }));
+  return [...fromSchedule, ...extra, { id: "other", name: "Other (describe it below)" }];
+}
+
+// Everything the main screen shows: the car, what is due, the history.
+function garageView(db) {
+  const { car, due } = minder.garageStatus(db.vehicle, db.car, db.history);
+  return {
+    vehicle: { ...db.vehicle, mileageKm: car.mileageKm },
+    car,
+    due,
+    history: db.history,
+    serviceOptions: serviceOptions(db.vehicle),
+  };
+}
+
+// Save a mileage reading for the car's (simulated) today, replacing one already saved for that day.
+function saveReading(db, km) {
+  db.car.readings = db.car.readings.filter((r) => r.date !== db.car.today);
+  db.car.readings.push({ date: db.car.today, km });
+  db.vehicle.mileageKm = km;
+}
+
+// The page asks for the demo owner's car, what is due and the service history here.
 app.get("/api/garage", (req, res) => {
+  res.json(garageView(readDb()));
+});
+
+// Demo button: the simulated car drives a normal week. The date moves 7 days forward
+// and the mileage goes up by the car's usual weekly distance.
+app.post("/api/car/simulate-week", (req, res) => {
   const db = readDb();
-  res.json({ vehicle: db.vehicle, history: db.history });
+  const now = minder.latestReading(db.car.readings);
+  const perDay = minder.kmPerDay(db.car.readings, db.car.today) || 30;
+  db.car.today = minder.addDays(db.car.today, 7);
+  saveReading(db, Math.round(now.km + perDay * 7));
+  writeDb(db);
+  res.json(garageView(db));
 });
 
 // Safety words we always flag, even if the AI forgets to.
@@ -35,7 +76,7 @@ const SAFETY_NOTE = "Safety item: if you are unsure, have a qualified technician
 // fails, times out or gives an unusable answer, we fall back to the built-in rules (M1).
 app.post("/api/check", async (req, res) => {
   const db = readDb();
-  const garage = { vehicle: db.vehicle, history: db.history };
+  const garage = { vehicle: db.vehicle, history: db.history, car: db.car };
   const question = String((req.body && req.body.question) || "").trim();
   if (!question) {
     return res.status(400).json({ error: "Please type your question or paste the quote first." });
@@ -79,15 +120,21 @@ function parseKm(value) {
   return { km };
 }
 
-function parseItem(body) {
+// A history item: the service is picked from the list (so the minder can count it),
+// with an optional description; "Other" needs a description.
+function parseItem(body, db) {
   const b = body || {};
-  const item = String(b.item || "").trim();
-  if (!item) return { error: "Please describe the service or repair." };
+  const option = serviceOptions(db.vehicle).find((o) => o.id === b.service);
+  if (!option) return { error: "Please pick the service from the list." };
+  const details = String(b.item || "").trim();
+  if (option.id === "other" && !details) return { error: "Please describe the service or repair." };
+  const item = option.id === "other" ? details : details ? `${option.name}: ${details}` : option.name;
   if (item.length > 120) return { error: "Please keep the description under 120 characters." };
 
   const date = String(b.date || "").trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(Date.parse(date))) return { error: "Please pick the date of the service." };
-  if (date > new Date().toISOString().slice(0, 10)) return { error: "The date cannot be in the future." };
+  // The car's clock is simulated, so "the future" means after the car's today.
+  if (date > db.car.today) return { error: "The date cannot be in the future." };
 
   const mileage = parseKm(b.mileageKm);
   if (mileage.error) return mileage;
@@ -98,24 +145,30 @@ function parseItem(body) {
   if (!["done", "recommended"].includes(b.status)) return { error: "Please choose whether the work was done or only recommended." };
 
   const shop = String(b.shop || "").trim().slice(0, 80) || "Not given";
-  return { entry: { date, mileageKm: mileage.km, item, status: b.status, cost: Number(costText), shop } };
+  const services = option.id === "other" ? [] : [option.id];
+  return { entry: { date, mileageKm: mileage.km, item, services, status: b.status, cost: Number(costText), shop } };
 }
 
-// Update the vehicle's current mileage (saved, so it is still there after a reload).
+// Correct the car's current mileage by hand (saved as today's reading, so it survives a reload).
 app.put("/api/vehicle/mileage", (req, res) => {
   const { km, error } = parseKm(req.body && req.body.mileageKm);
   if (error) return res.status(400).json({ error });
   const db = readDb();
-  db.vehicle.mileageKm = km;
+  // An odometer never goes backwards: compare with the last reading before today.
+  const earlier = db.car.readings.filter((r) => r.date < db.car.today).sort((a, b) => a.date.localeCompare(b.date)).at(-1);
+  if (earlier && km < earlier.km) {
+    return res.status(400).json({ error: `Mileage cannot be lower than the last reading (${minder.fmtKm(earlier.km)} on ${minder.fmtDate(earlier.date)}).` });
+  }
+  saveReading(db, km);
   writeDb(db);
-  res.json({ vehicle: db.vehicle });
+  res.json(garageView(db));
 });
 
 // Add an item to the service history (saved, so it is still there after a reload).
 app.post("/api/history", (req, res) => {
-  const { entry, error } = parseItem(req.body);
-  if (error) return res.status(400).json({ error });
   const db = readDb();
+  const { entry, error } = parseItem(req.body, db);
+  if (error) return res.status(400).json({ error });
   const id = db.history.reduce((max, h) => Math.max(max, h.id), 0) + 1;
   db.history.push({ id, ...entry });
   writeDb(db);

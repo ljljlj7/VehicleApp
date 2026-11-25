@@ -149,7 +149,7 @@ async function askAI(question, garage) {
       name: "lookup_reference",
       description: "The app's reference data: supported vehicles and trims, a sample maintenance schedule, and per-service price, interval and DIY estimates. Treat it as a starting point to verify, not as fact.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
-      run: async () => JSON.stringify({ vehicles: KB.vehicles, schedule: KB.schedule, services: KB.services, diyScale: KB.diyScale }),
+      run: async () => JSON.stringify({ vehicles: KB.vehicles, schedules: JSON.parse(fs.readFileSync(path.join(__dirname, "data", "schedules.json"), "utf8")), services: KB.services, diyScale: KB.diyScale }),
     }),
     betaTool({
       name: "give_answer",

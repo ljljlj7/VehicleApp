@@ -31,19 +31,58 @@ function historyRow(entry) {
     el("div", { className: "cost", textContent: money(entry.cost) }));
 }
 
-async function loadGarage() {
-  const res = await fetch("/api/garage");
-  const { vehicle, history: saved } = await res.json();
-  const history = [...saved].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+// One item in the "What's due" panel.
+const DUE_LABEL = { overdue: "Overdue", soon: "Due now", later: "" };
+
+function dueItem(item) {
+  const source = item.page != null
+    ? el("a", { href: item.source.url, target: "_blank", rel: "noopener", textContent: `Guide p. ${item.page}` })
+    : el("a", { href: item.source.url, target: "_blank", rel: "noopener", textContent: "Source" });
+  return el("li", { className: `due ${item.status}` },
+    el("div", { className: "service-head" },
+      el("strong", { textContent: item.name }),
+      DUE_LABEL[item.status] && el("span", { className: `pill ${item.status}`, textContent: DUE_LABEL[item.status] })),
+    el("div", { textContent: item.text.when }),
+    el("div", { className: "meta" }, [item.text.expected, item.text.last].filter(Boolean).join(" · "), " · ", source));
+}
+
+function renderGarage(garage) {
+  const { vehicle, car, due } = garage;
+  const history = [...garage.history].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
 
   document.getElementById("vehicle-line").textContent =
-    `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim} · ${km(vehicle.mileageKm)}`;
-  document.getElementById("mileage").placeholder = `e.g. ${vehicle.mileageKm}`;
+    `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim} · ${km(car.mileageKm)}`;
+  document.getElementById("car-line").textContent =
+    `Simulated date: ${car.todayLabel}` + (car.kmPerWeek != null ? ` · You drive about ${km(car.kmPerWeek)} a week` : "");
+  document.getElementById("mileage").placeholder = `e.g. ${car.mileageKm}`;
+
+  if (due) {
+    const now = due.items.filter((i) => i.status !== "later");
+    const next = due.items.filter((i) => i.status === "later").slice(0, 4);
+    document.getElementById("due-now").replaceChildren(now.length
+      ? el("ul", { className: "due-list" }, ...now.map(dueItem))
+      : el("p", { className: "note", textContent: "Nothing is due right now." }));
+    document.getElementById("due-next").replaceChildren(...next.map(dueItem));
+    document.getElementById("due-source").textContent =
+      "Each item is due at a distance or after a time, whichever comes first. Dates are estimates from how much you drive.";
+  }
+
+  const select = document.getElementById("service-select");
+  const picked = select.value;
+  select.replaceChildren(
+    el("option", { value: "", textContent: "Pick a service…" }),
+    ...garage.serviceOptions.map((o) => el("option", { value: o.id, textContent: o.name })));
+  select.value = picked;
 
   const done = document.getElementById("history-done");
   const recommended = document.getElementById("history-recommended");
   done.replaceChildren(...history.filter((h) => h.status === "done").map(historyRow));
   recommended.replaceChildren(...history.filter((h) => h.status === "recommended").map(historyRow));
+}
+
+async function loadGarage() {
+  const res = await fetch("/api/garage");
+  renderGarage(await res.json());
 }
 
 // --- Rendering an answer ---------------------------------------------------
@@ -207,7 +246,23 @@ document.getElementById("mileage-form").addEventListener("submit", async (event)
   const { ok, data } = await sendJson("/api/vehicle/mileage", "PUT", { mileageKm: input.value });
   if (!ok) return showMsg("mileage-msg", data.error, "error");
   showMsg("mileage-msg", "Mileage saved.", "ok");
-  await loadGarage();
+  renderGarage(data);
+});
+
+// Demo: the simulated car drives a week; mileage, date and the due list update.
+document.getElementById("simulate-week").addEventListener("click", async (event) => {
+  const button = event.target;
+  button.disabled = true;
+  const { ok, data } = await sendJson("/api/car/simulate-week", "POST", {});
+  button.disabled = false;
+  if (!ok) return showMsg("simulate-msg", data.error, "error");
+  showMsg("simulate-msg", `A week later: ${km(data.car.mileageKm)} on ${data.car.todayLabel}.`, "ok");
+  renderGarage(data);
+});
+
+// "Other" needs a description; for listed services it is optional.
+document.getElementById("service-select").addEventListener("change", (event) => {
+  document.getElementById("details-hint").textContent = event.target.value === "other" ? "(required)" : "(optional)";
 });
 
 document.getElementById("item-form").addEventListener("submit", async (event) => {
@@ -216,7 +271,8 @@ document.getElementById("item-form").addEventListener("submit", async (event) =>
   const values = Object.fromEntries(new FormData(form));
   // Quick checks in the browser; the server checks everything again.
   const problems = [
-    [!values.item.trim(), "item", "Please describe the service or repair."],
+    [!values.service, "service", "Please pick the service from the list."],
+    [values.service === "other" && !values.item.trim(), "item", "Please describe the service or repair."],
     [!values.date, "date", "Please pick the date of the service."],
     [!isKm(values.mileageKm), "mileageKm", KM_MSG],
   ].find(([bad]) => bad);
@@ -228,6 +284,7 @@ document.getElementById("item-form").addEventListener("submit", async (event) =>
   const { ok, data } = await sendJson("/api/history", "POST", values);
   if (!ok) return showMsg("item-msg", data.error, "error");
   form.reset();
+  document.getElementById("details-hint").textContent = "(optional)";
   showMsg("item-msg", `Saved "${data.entry.item}" to your history.`, "ok");
   await loadGarage();
 });
