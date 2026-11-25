@@ -20,3 +20,4 @@ Each test is one action and the result we expect to see. A person runs every tes
 | T14 | Under "Open recommendations", press "Mark done" on the air filter recommendation, check the filled-in form and save, then reload | The recommendation is no longer open; it is in the history as done with the date, km and cost you saved | | |
 | T15 | Edit a history entry (change the cost), save and reload; then delete it and reload | The new cost is shown after the reload; after deleting, the entry is gone | | |
 | T16 | In "Add a service", pick "Other" and type "oil change at Quick Lube" | A hint suggests "Engine oil and filter replacement" because it updates the reminders; "Use it" picks it from the list | | |
+| T17 | Press "Simulate a week" twice and add a service; then press "Reset demo", confirm, and reload | The car is back at 7,000 km on Nov 25, 2026 with the sample history; the added service is gone | | |

@@ -3,6 +3,13 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Reset demo button: 2026-11-25
+
+T17 in Chrome at 1280 px: after two simulated weeks and an added service visit (car at 15,000 km, Sep 1, 2027),
+"Reset demo" + confirm put the car back to 7,000 km · Nov 25, 2026, the history to the two sample entries (plus the open
+recommendation) and the timeline to "Next service 8,000 km"; same after reload. A saved problem report was kept.
+T4, T7, T8, T10–T12 re-run: pass. The demo script now uses the button instead of `git checkout -- data/db.json`.
+
 ## Last service = service visits only; date and km pre-filled: 2026-11-25
 
 - "Last service" now shows only a logged Toyota **service visit**. The sample's Nov 2 early oil change no longer

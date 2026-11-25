@@ -10,6 +10,7 @@ const minder = require("./minder");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, "data", "db.json");
+const SAMPLE_FILE = path.join(__dirname, "data", "db-sample.json"); // the starting sample data, for "Reset demo"
 const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "knowledge.json"), "utf8"));
 
 // Read and write the saved data (made-up sample data only, see README).
@@ -209,6 +210,15 @@ app.delete("/api/history/:id", (req, res) => {
   if (db.history.length === before) return res.status(404).json({ error: "That service is no longer in your history. Please reload the page." });
   writeDb(db);
   res.json({ ok: true });
+});
+
+// "Reset demo": put the sample car, readings and history back to the start (for testing and demos).
+// Problem reports are kept: they are feedback for the developers, not test data.
+app.post("/api/reset", (req, res) => {
+  const sample = JSON.parse(fs.readFileSync(SAMPLE_FILE, "utf8"));
+  sample.reports = readDb().reports;
+  writeDb(sample);
+  res.json(garageView(sample));
 });
 
 // "Report a problem" with an answer: saved for the developers to review.

@@ -3,7 +3,7 @@
 ## Before the demo (10 minutes ahead)
 
 1. Open PowerShell and go to the project folder: `cd "C:\Users\lafre\Downloads\VehicleApp"`
-2. Reset the sample data so the demo starts clean: `git checkout -- data/db.json`
+2. Once the app is open (step 4), press **Reset demo** in the top bar so the demo starts clean.
 3. Start the app: `npm.cmd start`. Check it prints `Auto-Mobile is running` and `AI: on` or `AI: off`.
 4. Open http://localhost:3000 in the browser, full screen (the app is designed for a computer screen).
 5. Keep `acceptance-test.md` open in another window so you can copy the test questions.
@@ -41,4 +41,4 @@ Close with: "Everything here is sample data in a course prototype; real use woul
 
 ## After the demo
 
-Reset the sample data again: `git checkout -- data/db.json`
+Press **Reset demo** in the top bar to put the sample data back.

@@ -51,7 +51,7 @@ The app connects to the car, so it knows the mileage without the user typing it 
 - F4 sourced links to any information presented as facts
 - F5 logged history of vehicle to use as a reference source. Entries are picked from a list in two groups: services scheduled by Toyota (saving one as done updates the service timeline) and repairs and other work (kept in the history only; "Other" takes a description). If "Other" text matches a listed service, the app suggests picking it. Entries can be edited and deleted. Dealer recommendations stay in an "Open recommendations" list until marked done or declined; declined ones stay in the history. The timeline's "Last service" is the last Toyota service visit; other scheduled work done in between (e.g. an early oil change) moves that item in the later cards, and repairs stay in the history only. A new entry starts with the car's current date and mileage (from the connected car).
 - F6 Service timeline on the main screen: the last service, the next service visit (highlighted, red when overdue) and later visits, each with its km, estimated date and what is included. Items are due by distance (km) only; the date is an estimate from how much the owner drives. (Prototype simplification: Toyota's "every 6 months" time limit is not used, so low-mileage drivers may be told later than Toyota requires.)
-- F7 Simulated car connection: mileage readings come from sample data and the screen says "Connected car (simulated)". A "Simulate a week of driving" button moves the simulated date forward and adds kilometres, for the demo. The user can still correct the mileage by hand.
+- F7 Simulated car connection: mileage readings come from sample data and the screen says "Connected car (simulated)". A "Simulate a week of driving" button moves the simulated date forward and adds kilometres, for the demo. The user can still correct the mileage by hand. A "Reset demo" button puts the sample car and history back to the start (testing aid; problem reports are kept).
 - F8 Mileage prediction: the app estimates when each next item will be due from the average distance driven.
 - F9 The AI gets the app's context: current mileage, the due list, the schedule and the service history. It looks things up in the owner's manual first and searches the web only for prices, DIY guides and owner forum posts.
 
@@ -89,7 +89,7 @@ The mileage readings from the "car" are made-up sample data. The schedule and ma
 **Safeguards.** No real tenant names or phone numbers in the demo. The AI service key is stored in the builder's Secrets panel. The README states that the app is a course prototype.
 
 ## 7. Acceptance tests
-16 tests in acceptance-test.md (T1–T8 original, T9–T13 for the minder and the manual, T14–T16 for the service history). The product is done when a person has clicked through all of them and each one passes.
+17 tests in acceptance-test.md (T1–T8 original, T9–T13 for the minder and the manual, T14–T16 for the service history, T17 for resetting the demo). The product is done when a person has clicked through all of them and each one passes.
 
 ## 8. Milestones
 - M0 Skeleton: the app opens and shows the main screen with made-up sample data

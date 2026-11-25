@@ -318,6 +318,21 @@ document.getElementById("simulate-week").addEventListener("click", async (event)
   renderGarage(data);
 });
 
+// "Reset demo": back to the sample car and history (problem reports are kept).
+document.getElementById("reset-demo").addEventListener("click", async () => {
+  if (!confirm("Reset the demo? The car goes back to 7,000 km on Nov 25, 2026 and the history to the sample entries. Your test changes are lost.")) return;
+  const { ok, data } = await sendJson("/api/reset", "POST", {});
+  clearTimeout(toastTimer);
+  if (!ok) return showMsg("simulate-msg", data.error, "error");
+  stopEdit();
+  document.getElementById("add-item").open = false;
+  document.getElementById("answer").hidden = true;
+  showMsg("item-msg", "", "ok");
+  showMsg("simulate-msg", "Demo reset to the sample data.", "ok");
+  toastTimer = setTimeout(() => { document.getElementById("simulate-msg").hidden = true; }, 3000);
+  renderGarage(data);
+});
+
 // --- Adding and editing history ---------------------------------------------
 
 const itemForm = document.getElementById("item-form");

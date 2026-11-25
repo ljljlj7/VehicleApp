@@ -95,6 +95,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .car-meta .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
 .car-meta > span:nth-child(2) { color: var(--ok); }
 .car-actions { display: flex; align-items: center; gap: 12px; }
+#reset-demo { font-size: 0.875rem; font-weight: 400; }
 
 /* "Correct mileage": a small popover under its label */
 .popover { position: relative; }
