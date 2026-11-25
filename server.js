@@ -23,14 +23,21 @@ function writeDb(db) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Services the user can pick when adding history: the car's schedule items, then other
-// known services (e.g. brakes), then "Other". Picking from a list lets the minder count it.
+// Services the user can pick when adding history, in two groups:
+// "scheduled" (Toyota's schedule: logging one updates the reminders) and
+// "repair" (known repairs and "Other": kept in the history only).
+// Keywords let the page suggest a listed service when "Other" text matches one.
 function serviceOptions(vehicle) {
   const schedule = minder.scheduleFor(vehicle.modelId);
-  const fromSchedule = schedule ? schedule.items.filter((i) => !i.partOf).map((i) => ({ id: i.id, name: i.name })) : [];
-  const extra = KB.services.filter((s) => !fromSchedule.some((o) => o.id === s.id)).map((s) => ({ id: s.id, name: s.name }));
-  return [...fromSchedule, ...extra, { id: "other", name: "Other (describe it below)" }];
+  const scheduled = schedule
+    ? schedule.items.filter((i) => !i.partOf).map((i) => ({ id: i.id, name: i.name, group: "scheduled", keywords: i.keywords || [] }))
+    : [];
+  const repairs = KB.services.filter((s) => !scheduled.some((o) => o.id === s.id))
+    .map((s) => ({ id: s.id, name: s.name, group: "repair", keywords: s.keywords || [] }));
+  return [...scheduled, ...repairs, { id: "other", name: "Other (describe it below)", group: "repair", keywords: [] }];
 }
+
+const STATUSES = ["done", "recommended", "declined"];
 
 // Everything the main screen shows: the car, what is due, the history.
 function garageView(db) {
@@ -124,13 +131,15 @@ function parseKm(value) {
 
 // A history item: the service is picked from the list (so the minder can count it),
 // with an optional description; "Other" needs a description.
-function parseItem(body, db) {
+// When editing (existing is given), the text field holds the whole description.
+function parseItem(body, db, existing = null) {
   const b = body || {};
   const option = serviceOptions(db.vehicle).find((o) => o.id === b.service);
   if (!option) return { error: "Please pick the service from the list." };
   const details = String(b.item || "").trim();
   if (option.id === "other" && !details) return { error: "Please describe the service or repair." };
-  const item = option.id === "other" ? details : details ? `${option.name}: ${details}` : option.name;
+  const item = existing ? details || option.name
+    : option.id === "other" ? details : details ? `${option.name}: ${details}` : option.name;
   if (item.length > 120) return { error: "Please keep the description under 120 characters." };
 
   const date = String(b.date || "").trim();
@@ -144,10 +153,13 @@ function parseItem(body, db) {
   const costText = String(b.cost ?? "").trim().replace(/[$,\s]/g, "");
   if (!/^\d+(\.\d{1,2})?$/.test(costText)) return { error: "Cost must be a number in dollars, for example 94.50 (use 0 if it was free)." };
 
-  if (!["done", "recommended"].includes(b.status)) return { error: "Please choose whether the work was done or only recommended." };
+  if (!STATUSES.includes(b.status)) return { error: "Please choose whether the work was done, recommended or declined." };
 
   const shop = String(b.shop || "").trim().slice(0, 80) || "Not given";
-  const services = option.id === "other" ? [] : [option.id];
+  // An entry can cover several services (e.g. "oil change, tire rotation"): keep them when editing
+  // unless the user picked a different main service.
+  const services = option.id === "other" ? []
+    : existing && (existing.services || [])[0] === option.id ? existing.services : [option.id];
   return { entry: { date, mileageKm: mileage.km, item, services, status: b.status, cost: Number(costText), shop } };
 }
 
@@ -175,6 +187,28 @@ app.post("/api/history", (req, res) => {
   db.history.push({ id, ...entry });
   writeDb(db);
   res.status(201).json({ entry: { id, ...entry } });
+});
+
+// Edit a history item (also used for "Mark done" and "Decline" on a recommendation).
+app.put("/api/history/:id", (req, res) => {
+  const db = readDb();
+  const index = db.history.findIndex((h) => String(h.id) === req.params.id);
+  if (index < 0) return res.status(404).json({ error: "That service is no longer in your history. Please reload the page." });
+  const { entry, error } = parseItem(req.body, db, db.history[index]);
+  if (error) return res.status(400).json({ error });
+  db.history[index] = { id: db.history[index].id, ...entry };
+  writeDb(db);
+  res.json({ entry: db.history[index] });
+});
+
+// Delete a history item.
+app.delete("/api/history/:id", (req, res) => {
+  const db = readDb();
+  const before = db.history.length;
+  db.history = db.history.filter((h) => String(h.id) !== req.params.id);
+  if (db.history.length === before) return res.status(404).json({ error: "That service is no longer in your history. Please reload the page." });
+  writeDb(db);
+  res.json({ ok: true });
 });
 
 // "Report a problem" with an answer: saved for the developers to review.

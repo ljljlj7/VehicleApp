@@ -16,7 +16,18 @@
           "everyKm": 8000,
           "page": 1,
           "detailsPage": 3,
-          "description": "Toyota checks the lights, horn and wipers, tire tread, the brakes (wheels off), the cabin and engine air filters and any fluid leaks, and rotates the tires."
+          "description": "Toyota checks the lights, horn and wipers, tire tread, the brakes (wheels off), the cabin and engine air filters and any fluid leaks, and rotates the tires.",
+          "keywords": [
+            "service visit",
+            "inspection",
+            "multi-point",
+            "multipoint",
+            "maintenance service",
+            "maintenance visit",
+            "service #1",
+            "service #2",
+            "service #3"
+          ]
         },
         {
           "id": "oil_change",
@@ -25,7 +36,14 @@
           "everyKm": 16000,
           "page": 1,
           "detailsPage": 3,
-          "description": "Replace the engine oil and filter. On AWD models Toyota also tightens the propeller shaft bolts and checks the block heater (if equipped)."
+          "description": "Replace the engine oil and filter. On AWD models Toyota also tightens the propeller shaft bolts and checks the block heater (if equipped).",
+          "keywords": [
+            "oil change",
+            "oil and filter",
+            "oil & filter",
+            "engine oil",
+            "oil"
+          ]
         },
         {
           "id": "major_inspection",
@@ -34,7 +52,15 @@
           "everyKm": 32000,
           "page": 1,
           "detailsPage": 4,
-          "description": "Toyota removes the brake calipers to measure the pads and rotors, checks the 12-volt battery, listens for valve clearance and inspects the fuel system."
+          "description": "Toyota removes the brake calipers to measure the pads and rotors, checks the 12-volt battery, listens for valve clearance and inspects the fuel system.",
+          "keywords": [
+            "brake measurement",
+            "measure brake",
+            "battery check",
+            "battery health",
+            "valve clearance",
+            "service #3"
+          ]
         },
         {
           "id": "brake_fluid",
@@ -43,7 +69,10 @@
           "everyKm": 48000,
           "page": 1,
           "description": "Replace the brake fluid.",
-          "detailsPage": 1
+          "detailsPage": 1,
+          "keywords": [
+            "brake fluid"
+          ]
         },
         {
           "id": "transfer_case_fluid",
@@ -52,7 +81,10 @@
           "everyKm": 48000,
           "page": 1,
           "description": "Replace the fluid in the AWD transfer case.",
-          "detailsPage": 1
+          "detailsPage": 1,
+          "keywords": [
+            "transfer case"
+          ]
         },
         {
           "id": "tire_rotation",
@@ -110,14 +142,32 @@
           "name": "Service visit (inspection and tire rotation)",
           "short": "Inspection & tire rotation",
           "everyKm": 8000,
-          "page": null
+          "page": null,
+          "keywords": [
+            "service visit",
+            "inspection",
+            "multi-point",
+            "multipoint",
+            "maintenance service",
+            "maintenance visit",
+            "service #1",
+            "service #2",
+            "service #3"
+          ]
         },
         {
           "id": "oil_change",
           "name": "Oil and filter change",
           "short": "Oil & filter",
           "everyKm": 16000,
-          "page": null
+          "page": null,
+          "keywords": [
+            "oil change",
+            "oil and filter",
+            "oil & filter",
+            "engine oil",
+            "oil"
+          ]
         },
         {
           "id": "tire_rotation",

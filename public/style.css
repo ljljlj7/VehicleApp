@@ -237,6 +237,19 @@ dialog[open] { animation: pop-in 180ms cubic-bezier(0.25, 1, 0.5, 1); }
 .history .cost { grid-row: 1; grid-column: 2; font-variant-numeric: tabular-nums; }
 .tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; vertical-align: 1px; }
 .tag.recommended { background: var(--warn-soft); color: var(--warn); }
+.tag.declined { background: var(--tile); color: var(--muted); }
+.history .row-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 2px; }
+.row-action { padding: 0; font-size: 0.8rem; font-weight: 500; color: var(--muted); background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; }
+.row-action:hover { color: var(--ink); }
+.row-action.strong { color: var(--accent-ink); font-weight: 600; }
+.recs { margin-bottom: 20px; padding: 14px 16px 4px; border-radius: var(--radius); background: var(--warn-soft); }
+.recs h3 { font-size: 0.9rem; margin-bottom: 6px; color: var(--warn); }
+.recs .history { border-top: 0; }
+.recs .history li:last-child { border-bottom: 0; }
+.recs .history li { border-color: #f1dcb8; }
+.field-hint { margin-top: -6px; font-size: 0.8rem; color: var(--muted); }
+.suggest { margin-top: -6px; padding: 8px 10px; border-radius: 8px; background: var(--accent-soft); font-size: 0.85rem; }
+.form-actions { display: flex; gap: 10px; }
 
 #add-item { margin-top: 16px; }
 #add-item summary { cursor: pointer; font-weight: 600; color: var(--accent-ink); }
@@ -244,7 +257,7 @@ dialog[open] { animation: pop-in 180ms cubic-bezier(0.25, 1, 0.5, 1); }
 .stack-form label { display: block; font-size: 0.875rem; color: var(--muted); }
 .stack-form label input, .stack-form label select { margin-top: 4px; }
 .stack-form .span-2 { grid-column: 1 / -1; }
-.stack-form button { justify-self: start; }
+.stack-form .form-actions button { justify-self: start; }
 
 /* --- An answer --- */
 .answer {

@@ -62,12 +62,47 @@ document.getElementById("service-dialog").addEventListener("click", (event) => {
   if (event.target === event.currentTarget) event.currentTarget.close();
 });
 
-function historyRow(h) {
+// --- Service history: open recommendations, then everything else -------------
+
+let currentGarage = null;
+const TAGS = { recommended: "Recommended", declined: "Declined" };
+
+// One history row. With actions (in the history panel) it gets Edit / Delete,
+// and an open recommendation also gets Mark done / Decline.
+function historyRow(h, withActions = false) {
+  const action = (label, onclick, cls = "") => el("button", { type: "button", className: `row-action ${cls}`, textContent: label, onclick });
   return el("li", {},
     el("span", { className: "what" }, h.item,
-      h.status === "recommended" && el("span", { className: "tag recommended", textContent: "Recommended" })),
+      TAGS[h.status] && !(withActions && h.status === "recommended") && el("span", { className: `tag ${h.status}`, textContent: TAGS[h.status] })),
     el("span", { className: "cost", textContent: money(h.cost) }),
-    el("span", { className: "meta", textContent: `${shortDate(h.date)} · ${km(h.mileageKm)} · ${h.shop}` }));
+    el("span", { className: "meta", textContent: `${shortDate(h.date)} · ${km(h.mileageKm)} · ${h.shop}` }),
+    withActions && el("span", { className: "row-actions" },
+      h.status === "recommended" && action("Mark done", () => startEdit(h, "done"), "strong"),
+      h.status === "recommended" && action("Decline", () => decline(h)),
+      action("Edit", () => startEdit(h)),
+      action("Delete", () => removeEntry(h))));
+}
+
+function renderHistory(garage) {
+  const newestFirst = (a, b) => b.date.localeCompare(a.date) || b.id - a.id;
+  const open = garage.history.filter((h) => h.status === "recommended").sort(newestFirst);
+  const rest = garage.history.filter((h) => h.status !== "recommended").sort(newestFirst);
+  document.getElementById("open-recs").hidden = open.length === 0;
+  document.getElementById("recs-list").replaceChildren(...open.map((h) => historyRow(h, true)));
+  document.getElementById("history-list").replaceChildren(...rest.map((h) => historyRow(h, true)));
+}
+
+// The service list in two groups: scheduled (updates reminders) and repairs / other (history only).
+function renderServiceSelect(options) {
+  const select = document.getElementById("service-select");
+  const picked = select.value;
+  const group = (label, key) => el("optgroup", { label },
+    options.filter((o) => o.group === key).map((o) => el("option", { value: o.id, textContent: o.name })));
+  select.replaceChildren(
+    el("option", { value: "", textContent: "Pick a service…" }),
+    group("Scheduled by Toyota (updates your reminders)", "scheduled"),
+    group("Repairs and other work (kept in your history)", "repair"));
+  select.value = picked;
 }
 
 function renderGarage(garage) {
@@ -86,15 +121,9 @@ function renderGarage(garage) {
   document.getElementById("timeline").scrollLeft = 0;
   updateScrollButtons();
 
-  const history = [...garage.history].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
-  document.getElementById("history-list").replaceChildren(...history.map(historyRow));
-
-  const select = document.getElementById("service-select");
-  const picked = select.value;
-  select.replaceChildren(
-    el("option", { value: "", textContent: "Pick a service…" }),
-    ...garage.serviceOptions.map((o) => el("option", { value: o.id, textContent: o.name })));
-  select.value = picked;
+  currentGarage = garage;
+  renderHistory(garage);
+  renderServiceSelect(garage.serviceOptions);
 }
 
 async function loadGarage() {
@@ -124,7 +153,7 @@ const IMPORTANCE = { safety: "Safety critical", important: "Important", routine:
 function serviceBlock(s) {
   const pastWork = s.history.length
     ? el("p", { className: "note", textContent:
-        "In your history: " + s.history.map((h) => `${h.status === "done" ? "done" : "recommended"} ${shortDate(h.date)} at ${km(h.mileageKm)} (${money(h.cost)})`).join("; ") })
+        "In your history: " + s.history.map((h) => `${{ done: "done", recommended: "recommended", declined: "declined" }[h.status]} ${shortDate(h.date)} at ${km(h.mileageKm)} (${money(h.cost)})`).join("; ") })
     : null;
   const fact = (label, ...value) => el("div", {}, el("dt", { textContent: label }), el("dd", {}, ...value));
 
@@ -221,7 +250,7 @@ function renderAnswer(a, question) {
 
   if (a.history) {
     const list = (title, rows) => el("div", {}, el("h4", { textContent: title }),
-      rows.length ? el("ul", { className: "history" }, rows.map(historyRow)) : el("p", { className: "note", textContent: "None on file." }));
+      rows.length ? el("ul", { className: "history" }, rows.map((h) => historyRow(h))) : el("p", { className: "note", textContent: "None on file." }));
     parts.push(list("Confirmed work", a.history.done), list("Recommended, not done yet", a.history.recommended));
   }
 
@@ -288,15 +317,122 @@ document.getElementById("simulate-week").addEventListener("click", async (event)
   renderGarage(data);
 });
 
-// "Other" needs a description; for listed services it is optional.
-document.getElementById("service-select").addEventListener("change", (event) => {
-  document.getElementById("details-hint").textContent = event.target.value === "other" ? "(required)" : "(optional)";
+// --- Adding and editing history ---------------------------------------------
+
+const itemForm = document.getElementById("item-form");
+// Note: form.elements.item is a built-in function, so the "item" field is read with namedItem("item").
+const optionFor = (id) => (currentGarage ? currentGarage.serviceOptions.find((o) => o.id === id) : null);
+
+// Under the service list: say whether this choice updates the reminders.
+function updateServiceHint() {
+  const editing = Boolean(itemForm.elements.id.value);
+  const value = itemForm.elements.service.value;
+  const option = optionFor(value);
+  const hint = document.getElementById("service-hint");
+  hint.hidden = !option;
+  if (option) {
+    hint.textContent = option.group === "scheduled"
+      ? "Scheduled by Toyota: saving it as done updates your service timeline."
+      : "Kept in your history; it doesn't change the service timeline.";
+  }
+  document.getElementById("details-hint").textContent = editing ? "" : value === "other" ? "(required)" : "(optional)";
+  updateOtherHint();
+}
+
+// Typing a listed service under "Other": suggest picking it from the list instead.
+function bestMatch(text) {
+  const words = text.toLowerCase();
+  let best = null;
+  for (const o of currentGarage.serviceOptions) {
+    for (const k of o.keywords || []) {
+      const escaped = k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`(^|[^a-z])${escaped}([^a-z]|$)`).test(words) && (!best || k.length > best.k.length)) best = { o, k };
+    }
+  }
+  return best && best.o;
+}
+
+function updateOtherHint() {
+  const hint = document.getElementById("other-hint");
+  const match = itemForm.elements.service.value === "other" && currentGarage && bestMatch(itemForm.elements.namedItem("item").value);
+  hint.hidden = !match;
+  if (!match) return;
+  const why = match.group === "scheduled" ? "That one updates your reminders." : "It's in the list.";
+  hint.replaceChildren(`Did you mean "${match.name}"? ${why} `,
+    el("button", { type: "button", className: "row-action strong", textContent: "Use it", onclick: () => {
+      itemForm.elements.service.value = match.id;
+      updateServiceHint();
+    } }));
+}
+
+itemForm.elements.service.addEventListener("change", updateServiceHint);
+itemForm.elements.namedItem("item").addEventListener("input", updateOtherHint);
+
+function setFormMode(entry) {
+  const editing = Boolean(entry);
+  document.getElementById("add-item-summary").textContent = editing ? "Edit service" : "Add a service";
+  document.getElementById("item-submit").textContent = editing ? "Save changes" : "Save";
+  document.getElementById("item-cancel").hidden = !editing;
+  document.getElementById("details-label").textContent = editing ? "Description" : "Details";
+}
+
+// Edit an entry. "Mark done" is an edit with status done, today's (simulated) date and km.
+function startEdit(h, status = null) {
+  const f = itemForm.elements;
+  itemForm.reset();
+  f.id.value = h.id;
+  f.service.value = optionFor((h.services || [])[0]) ? h.services[0] : "other";
+  f.namedItem("item").value = h.item;
+  f.date.value = status === "done" ? currentGarage.car.today : h.date;
+  f.mileageKm.value = status === "done" ? currentGarage.car.mileageKm : h.mileageKm;
+  f.cost.value = h.cost;
+  f.status.value = status || h.status;
+  f.shop.value = h.shop === "Not given" ? "" : h.shop;
+  setFormMode(h);
+  updateServiceHint();
+  showMsg("item-msg", status === "done" ? "Check the date, mileage and cost, then save." : "", "ok");
+  const details = document.getElementById("add-item");
+  details.open = true;
+  details.scrollIntoView({ block: "nearest" });
+  f.service.focus();
+}
+
+function stopEdit() {
+  itemForm.reset();
+  itemForm.elements.id.value = "";
+  setFormMode(null);
+  updateServiceHint();
+}
+
+document.getElementById("item-cancel").addEventListener("click", () => {
+  stopEdit();
+  showMsg("item-msg", "", "ok");
+  document.getElementById("add-item").open = false;
 });
 
-document.getElementById("item-form").addEventListener("submit", async (event) => {
+// Send an existing entry back with some fields changed (used by Decline).
+function entryBody(h, changes) {
+  return { service: (h.services || [])[0] || "other", item: h.item, date: h.date, mileageKm: String(h.mileageKm),
+    cost: String(h.cost), status: h.status, shop: h.shop === "Not given" ? "" : h.shop, ...changes };
+}
+
+async function decline(h) {
+  const { ok, data } = await sendJson(`/api/history/${h.id}`, "PUT", entryBody(h, { status: "declined" }));
+  if (!ok) return alert(data.error);
+  await loadGarage();
+}
+
+async function removeEntry(h) {
+  if (!confirm(`Delete "${h.item}" from your history?`)) return;
+  const { ok, data } = await sendJson(`/api/history/${h.id}`, "DELETE", {});
+  if (!ok) return alert(data.error);
+  if (itemForm.elements.id.value === String(h.id)) stopEdit();
+  await loadGarage();
+}
+
+itemForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const form = event.target;
-  const values = Object.fromEntries(new FormData(form));
+  const values = Object.fromEntries(new FormData(itemForm));
   // Quick checks in the browser; the server checks everything again.
   const problems = [
     [!values.service, "service", "Please pick the service from the list."],
@@ -306,14 +442,16 @@ document.getElementById("item-form").addEventListener("submit", async (event) =>
   ].find(([bad]) => bad);
   if (problems) {
     showMsg("item-msg", problems[2], "error");
-    form.elements[problems[1]].focus();
+    itemForm.elements[problems[1]].focus();
     return;
   }
-  const { ok, data } = await sendJson("/api/history", "POST", values);
+  const editing = Boolean(values.id);
+  const { ok, data } = editing
+    ? await sendJson(`/api/history/${values.id}`, "PUT", values)
+    : await sendJson("/api/history", "POST", values);
   if (!ok) return showMsg("item-msg", data.error, "error");
-  form.reset();
-  document.getElementById("details-hint").textContent = "(optional)";
-  showMsg("item-msg", `Saved "${data.entry.item}" to your history.`, "ok");
+  stopEdit();
+  showMsg("item-msg", `${editing ? "Updated" : "Saved"} "${data.entry.item}".`, "ok");
   await loadGarage();
 });
 

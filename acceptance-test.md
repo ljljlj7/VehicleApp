@@ -17,3 +17,6 @@ Each test is one action and the result we expect to see. A person runs every tes
 | T11 | Click a service in the timeline, then the link in the pop-up | The pop-up explains the service; the link opens the Toyota maintenance schedule in the browser, with the page number shown | | |
 | T12 | Paste "The dealer says I need a tire rotation, is it due?" | Answer says whether it is due at the current mileage according to the schedule (with guide page), and when it was last done | | |
 | T13 | Paste "What oil does my car need and how much?" | Answer gives the oil type and amount, citing the page of the Toyota owner's manual | | |
+| T14 | Under "Open recommendations", press "Mark done" on the air filter recommendation, check the filled-in form and save, then reload | The recommendation is no longer open; it is in the history as done with the date, km and cost you saved | | |
+| T15 | Edit a history entry (change the cost), save and reload; then delete it and reload | The new cost is shown after the reload; after deleting, the entry is gone | | |
+| T16 | In "Add a service", pick "Other" and type "oil change at Quick Lube" | A hint suggests "Engine oil and filter replacement" because it updates the reminders; "Use it" picks it from the list | | |

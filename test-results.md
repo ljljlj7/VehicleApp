@@ -3,6 +3,25 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Service history: scheduled vs. other work: 2026-11-25
+
+Changes: the service list has two groups ("Scheduled by Toyota (updates your reminders)" and "Repairs and other work
+(kept in your history)") with a one-line hint under it; "Other" text that matches a listed service shows "Did you mean …?
+Use it"; history entries can be edited and deleted; open recommendations are listed together with Mark done / Decline;
+new status "Recommended, declined"; the timeline's "Last service" counts scheduled services only.
+
+Clicked through in Chrome at 1280 px (basic answers):
+
+| ID | What we saw | Result |
+|----|-------------|--------|
+| T14 | "Mark done" on "Replace cabin and engine air filters" opened "Edit service" filled with Nov 25, 2026, 7,000 km, $170, status Done; saved with $60; after reload the open list is gone and the entry is in the history as done | Pass |
+| T15 | Edited "Wiper blades replaced (front)" from $35 to $42.50: kept after reload; deleted it: gone after reload | Pass |
+| T16 | "Other" + "oil change at Quick Lube" → "Did you mean "Engine oil and filter replacement"? That one updates your reminders. Use it"; Use it switched the list to it | Pass |
+| Also | Declining a brake fluid recommendation moved it to the history with a "Declined" tag. A wiper blade repair did not replace the "Last service" card. Editing "Oil and filter change, tire rotation" kept both services. | Pass |
+| T1–T12 | Re-run, unchanged | Pass (basic answers) |
+
+Screenshot: `16-history-panel.jpg`.
+
 ## Service pop-up: 2026-11-25
 
 Simplified: the details panel under the timeline is gone. Each service in a card is a link that opens a pop-up with

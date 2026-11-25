@@ -49,7 +49,7 @@ The app connects to the car, so it knows the mileage without the user typing it 
 - F2 Repository of factory technical manuals and recommended service intervals. The maintenance schedule is converted from Toyota Canada's official maintenance schedule (in km) into structured data by AI, then checked by a second, independent read of the PDF that compares every item at every service visit (no human check in the prototype). Each schedule item keeps its page as the source. The owner's manual is stored as searchable pages.
 - F3 user interface that allows information for vehicles to be entered to reference manuals and recommended service. Based on mileage input.
 - F4 sourced links to any information presented as facts
-- F5 logged history of vehicle to use as a reference source. New entries are picked from a list of services, so each one updates what is due.
+- F5 logged history of vehicle to use as a reference source. Entries are picked from a list in two groups: services scheduled by Toyota (saving one as done updates the service timeline) and repairs and other work (kept in the history only; "Other" takes a description). If "Other" text matches a listed service, the app suggests picking it. Entries can be edited and deleted. Dealer recommendations stay in an "Open recommendations" list until marked done or declined; declined ones stay in the history. The timeline's "Last service" is the last scheduled service, not a repair.
 - F6 Service timeline on the main screen: the last service, the next service visit (highlighted, red when overdue) and later visits, each with its km, estimated date and what is included. Items are due by distance (km) only; the date is an estimate from how much the owner drives. (Prototype simplification: Toyota's "every 6 months" time limit is not used, so low-mileage drivers may be told later than Toyota requires.)
 - F7 Simulated car connection: mileage readings come from sample data and the screen says "Connected car (simulated)". A "Simulate a week of driving" button moves the simulated date forward and adds kilometres, for the demo. The user can still correct the mileage by hand.
 - F8 Mileage prediction: the app estimates when each next item will be due from the average distance driven.
@@ -89,7 +89,7 @@ The mileage readings from the "car" are made-up sample data. The schedule and ma
 **Safeguards.** No real tenant names or phone numbers in the demo. The AI service key is stored in the builder's Secrets panel. The README states that the app is a course prototype.
 
 ## 7. Acceptance tests
-13 tests in acceptance-test.md (T1–T8 original, T9–T13 for the minder and the manual). The product is done when a person has clicked through all of them and each one passes.
+16 tests in acceptance-test.md (T1–T8 original, T9–T13 for the minder and the manual, T14–T16 for the service history). The product is done when a person has clicked through all of them and each one passes.
 
 ## 8. Milestones
 - M0 Skeleton: the app opens and shows the main screen with made-up sample data

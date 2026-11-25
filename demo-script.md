@@ -26,6 +26,7 @@ part of the product (PRD section 5).
 | 5 | "It knows the car's history." | Paste T5 (service history) | Confirmed work vs recommended |
 | 6 | "If it doesn't know enough, it asks instead of guessing." | Paste T6 (2026 RAV4 Hybrid) | Asks for trim and mileage |
 | 7 | "You log a service once, and the reminders update." | Open **Add a service**, pick **Service visit (inspection and tire rotation)**, the simulated date shown in the top bar, the current km, $0, press **Save**, then press F5 | The item is still there after the reload; it becomes the "Last service" card and the next service moves 8,000 km on |
+| 7b | "Dealer recommendations stay open until you decide." | In **Open recommendations**, press **Mark done** on the air filters (or **Decline**) | The form fills in today's date and km; after saving, the recommendation leaves the open list. Air filters are repairs, so the timeline does not change |
 | 8 | "And it checks what you type." | Click **Correct mileage**, type `eight thousand`, press **Update**; then press **Check it** with an empty box | Both refused with a clear message |
 | 9 | "If something looks wrong, users can flag it." | Click **Report a problem with this answer** | Report saved for the developers |
 

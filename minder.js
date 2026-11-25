@@ -181,7 +181,10 @@ function garageStatus(vehicle, car, history) {
   const mileageKm = reading ? reading.km : vehicle.mileageKm;
   const rate = kmPerDay(car.readings, car.today);
   const dueItems = schedule ? computeDue({ schedule, mileageKm, today: car.today, startDate: vehicle.startDate, history, rate }) : [];
-  const last = history.filter((h) => h.status === "done")
+  // "Last service" = the last scheduled Toyota service (repairs and other work stay in the history only).
+  const scheduledIds = schedule ? schedule.items.filter((i) => !i.partOf).map((i) => i.id) : [];
+  const last = history
+    .filter((h) => h.status === "done" && (h.services || []).some((id) => scheduledIds.includes(id)))
     .sort((a, b) => b.date.localeCompare(a.date) || b.mileageKm - a.mileageKm)[0] || null;
   return {
     car: {

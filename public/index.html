@@ -59,29 +59,40 @@
       </section>
 
       <section aria-labelledby="history-title">
-        <div class="section-head">
-          <h2 id="history-title">Service history</h2>
+        <h2 id="history-title">Service history</h2>
+
+        <div id="open-recs" class="recs" hidden>
+          <h3>Open recommendations</h3>
+          <ul id="recs-list" class="history"></ul>
         </div>
+
         <ul id="history-list" class="history"></ul>
 
         <details id="add-item">
-          <summary>Add a service</summary>
+          <summary id="add-item-summary">Add a service</summary>
           <form id="item-form" class="stack-form" novalidate>
+            <input type="hidden" name="id">
             <label class="span-2">Service
               <select name="service" id="service-select"></select></label>
-            <label class="span-2">Details <span id="details-hint">(optional)</span>
+            <p id="service-hint" class="field-hint span-2" hidden></p>
+            <label class="span-2"><span id="details-label">Details</span> <span id="details-hint">(optional)</span>
               <input name="item" maxlength="120" placeholder="e.g. front pads only"></label>
+            <p id="other-hint" class="suggest span-2" hidden></p>
             <label>Date <input name="date" type="date"></label>
             <label>Mileage (km) <input name="mileageKm" inputmode="numeric" placeholder="e.g. 7500"></label>
             <label>Cost ($) <input name="cost" inputmode="decimal" placeholder="e.g. 94.50"></label>
             <label>Status
               <select name="status">
                 <option value="done">Done</option>
-                <option value="recommended">Recommended, not done</option>
+                <option value="recommended">Recommended, not done yet</option>
+                <option value="declined">Recommended, declined</option>
               </select></label>
             <label class="span-2">Shop (optional) <input name="shop" maxlength="80" placeholder="e.g. Sample Toyota Dealer"></label>
             <p id="item-msg" class="field-msg span-2" role="status" hidden></p>
-            <button type="submit" class="primary span-2">Save</button>
+            <div class="form-actions span-2">
+              <button type="submit" class="primary" id="item-submit">Save</button>
+              <button type="button" class="secondary" id="item-cancel" hidden>Cancel</button>
+            </div>
           </form>
         </details>
       </section>
