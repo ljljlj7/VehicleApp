@@ -32,12 +32,16 @@ No preference. Propose the simplest stack for this product and wait for approval
 ## Commands
 After the app first runs, write the install, run and test commands here and keep them current.
 
-- Needs: Node.js LTS (`winget install --id OpenJS.NodeJS.LTS -e`)
-- Install: `npm install`
-- Run in GitHub Codespaces (main way): on github.com/ljljlj7/VehicleApp click Code → Codespaces → Create codespace on main, then type `npm start` in its terminal; the app opens in a preview tab.
-- AI key: GitHub → Settings → Codespaces → Secrets → New secret, name `ANTHROPIC_API_KEY`, repository `ljljlj7/VehicleApp`. Restart the codespace after adding it. Without a key the app uses built-in rules.
-- Run on a laptop instead: `npm.cmd start` in the project folder (plain `npm` is blocked by Windows PowerShell's script setting), then open http://localhost:3000 (stop with Ctrl+C). The key can go in a local `.env` (copy `.env.example`); it is never uploaded.
-- Test: no automated tests yet; click through acceptance-test.md in the running app
+- Needs: Node.js 22.9 or newer (LTS) and Git. Windows: `winget install --id OpenJS.NodeJS.LTS -e` and `winget install --id Git.Git -e`. Mac: the LTS installer from nodejs.org or `brew install node`.
+- Get the code: `git clone https://github.com/ljljlj7/VehicleApp.git` (private repository; the user must be invited and signed in to GitHub).
+- Install: `npm install` (Windows PowerShell: `npm.cmd install`, because plain `npm` is blocked by its script setting)
+- Run: `npm start` (Windows PowerShell: `npm.cmd start`), then open http://localhost:3000; stop with Ctrl+C. It prints `AI: off` without a key; that is expected.
+- Run in GitHub Codespaces: on github.com/ljljlj7/VehicleApp click Code → Codespaces → Create codespace on main, type `npm start`, then Ports tab → port 3000 → globe icon to open it in a browser tab.
+- Update an existing copy: stop the app, `git checkout -- data/db.json`, `git pull`, `npm install`, start again.
+- Reset the sample data: the "Reset demo" button in the app (or `git checkout -- data/db.json`).
+- AI key (optional): local `.env` (copy `.env.example`), never uploaded; or GitHub → Settings → Codespaces → Secrets → `ANTHROPIC_API_KEY` for repository `ljljlj7/VehicleApp`, then restart the codespace. Without a key the app uses built-in rules.
+- Test: no automated tests; click through acceptance-test.md (T1–T17) in the running app; expected results are in test-results.md.
+- Setting it up for a teammate to test: install and start only; do not change, commit or push project files.
 
 ## Data and secrets
 - Never write an API key, password or token into code, chat or a file that is saved to GitHub. Read keys from environment variables.
