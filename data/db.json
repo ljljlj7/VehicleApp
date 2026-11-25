@@ -14,17 +14,50 @@
     "connection": "simulated",
     "today": "2026-11-25",
     "readings": [
-      { "date": "2026-04-01", "km": 15 },
-      { "date": "2026-05-01", "km": 880 },
-      { "date": "2026-06-01", "km": 1750 },
-      { "date": "2026-06-14", "km": 2150 },
-      { "date": "2026-07-01", "km": 2700 },
-      { "date": "2026-08-01", "km": 3650 },
-      { "date": "2026-09-01", "km": 4600 },
-      { "date": "2026-10-01", "km": 5500 },
-      { "date": "2026-11-01", "km": 6450 },
-      { "date": "2026-11-02", "km": 6500 },
-      { "date": "2026-11-25", "km": 7000 }
+      {
+        "date": "2026-04-01",
+        "km": 15
+      },
+      {
+        "date": "2026-05-01",
+        "km": 880
+      },
+      {
+        "date": "2026-06-01",
+        "km": 1750
+      },
+      {
+        "date": "2026-06-14",
+        "km": 2150
+      },
+      {
+        "date": "2026-07-01",
+        "km": 2700
+      },
+      {
+        "date": "2026-08-01",
+        "km": 3650
+      },
+      {
+        "date": "2026-09-01",
+        "km": 4600
+      },
+      {
+        "date": "2026-10-01",
+        "km": 5500
+      },
+      {
+        "date": "2026-11-01",
+        "km": 6450
+      },
+      {
+        "date": "2026-11-02",
+        "km": 6500
+      },
+      {
+        "date": "2026-11-25",
+        "km": 7000
+      }
     ]
   },
   "history": [
@@ -33,7 +66,7 @@
       "date": "2026-06-14",
       "mileageKm": 2150,
       "item": "Complimentary inspection",
-      "services": ["inspection"],
+      "services": [],
       "status": "done",
       "cost": 0,
       "shop": "Sample Toyota Dealer"
@@ -43,7 +76,10 @@
       "date": "2026-11-02",
       "mileageKm": 6500,
       "item": "Oil and filter change, tire rotation",
-      "services": ["oil_change", "tire_rotation"],
+      "services": [
+        "oil_change",
+        "tire_rotation"
+      ],
       "status": "done",
       "cost": 94.5,
       "shop": "Sample Toyota Dealer"
@@ -53,7 +89,10 @@
       "date": "2026-11-02",
       "mileageKm": 6500,
       "item": "Replace cabin and engine air filters",
-      "services": ["cabin_air_filter", "engine_air_filter"],
+      "services": [
+        "cabin_air_filter",
+        "engine_air_filter"
+      ],
       "status": "recommended",
       "cost": 170,
       "shop": "Sample Toyota Dealer"

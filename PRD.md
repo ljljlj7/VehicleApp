@@ -50,7 +50,7 @@ The app connects to the car, so it knows the mileage without the user typing it 
 - F3 user interface that allows information for vehicles to be entered to reference manuals and recommended service. Based on mileage input.
 - F4 sourced links to any information presented as facts
 - F5 logged history of vehicle to use as a reference source. New entries are picked from a list of services, so each one updates what is due.
-- F6 "What's due" panel on the main screen: due now, and next items with mileage and estimated date. An item is due by distance or by time, whichever comes first.
+- F6 "What's due" panel on the main screen: due now, and next items with mileage and estimated date. Items are due by distance (km) only; the date is an estimate from how much the owner drives. (Prototype simplification: Toyota's "every 6 months" time limit is not used, so low-mileage drivers may be told later than Toyota requires.)
 - F7 Simulated car connection: mileage readings come from sample data and the screen says "Connected car (simulated)". A "Simulate a week of driving" button moves the simulated date forward and adds kilometres, for the demo. The user can still correct the mileage by hand.
 - F8 Mileage prediction: the app estimates when each next item will be due from the average distance driven.
 - F9 The AI gets the app's context: current mileage, the due list, the schedule and the service history. It looks things up in the owner's manual first and searches the web only for prices, DIY guides and owner forum posts.

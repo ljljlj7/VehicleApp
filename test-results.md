@@ -10,6 +10,14 @@ The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the te
 **Schedule:** Toyota Canada's official 2025 RAV4 LE AWD maintenance schedule (km), plus the "every 6 months or 8,000 km"
 rule from Toyota Canada's 2025 owner's supplement (p. 25). The demo car is now an LE AWD to match.
 
+**Update (same day): due points by km only.** The 6-month time limit was dropped for the prototype (team decision);
+dates are now only estimates from driving. The June "complimentary inspection" no longer counts as a scheduled visit,
+so the first service visit is due at Toyota's 8,000 km. Re-run after the change, all in Chrome at phone size:
+T2 "Due now: Service visit … Due at 8,000 km. At your driving, that's around Dec 30, 2026"; T9 shows the same on the
+main screen; T10 7,198 km on Dec 2 after a simulated week, kept after reload; T12 "Toyota rotates the tires at every
+service visit. Next service visit: due at 8,000 km"; T1, T3–T8 and T11 unchanged. All pass (basic answers); the
+schedule's second read still matches the PDF. The result rows below are from the run before this change.
+
 **Second read of the schedule:** a separate script re-read the Toyota PDF and compared all 11 schedule items at every
 service visit from 8,000 to 120,000 km, plus the cited pages. Result: all items match, no problems found.
 

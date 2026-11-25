@@ -78,7 +78,7 @@ function describe(item) {
       ? `Overdue by ${fmtKm(-item.kmLeft)}`
       : `Overdue since ${fmtDate(item.dueDate)}`;
   } else if (item.expected && item.daysLeft != null) {
-    expected = `Expected ${inTime(item.daysLeft)} (around ${fmtDate(item.expected)})`;
+    expected = `At your driving, that's around ${fmtDate(item.expected)} (${inTime(item.daysLeft)})`;
   } else if (item.kmLeft != null) {
     expected = `${fmtKm(item.kmLeft)} from now`;
   } else {

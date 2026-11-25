@@ -1,5 +1,5 @@
 {
-  "_note": "rav4-2025: converted from Toyota Canada's official 2025 RAV4 LE AWD maintenance schedule (km), checked by a second read (M5b). Time limits: Toyota Canada's owner's supplement (p. 25) says maintenance is required every 6 months or 8,000 km, whichever occurs first; items done every N visits get N x 6 months. Items with 'partOf' have no interval of their own: they are done or inspected at that item's visit. rav4-hybrid-2026: still a SAMPLE schedule.",
+  "_note": "rav4-2025: converted from Toyota Canada official 2025 RAV4 LE AWD maintenance schedule (km), checked by a second read (M5b). Prototype simplification: items are due by km only; estimated dates come from how much the owner drives (Toyota also has a 6-month time limit, not used here). Items with partOf have no interval of their own: they are done or inspected at that item visit. rav4-hybrid-2026: still a SAMPLE schedule.",
   "vehicles": {
     "rav4-2025": {
       "label": "2025 Toyota RAV4 LE AWD (Canada)",
@@ -7,16 +7,11 @@
         "label": "Toyota Canada: Maintenance Schedule, 2025 RAV4 LE AWD",
         "url": "https://www.toyota.ca/content/toyota/en/owners/maintenance-schedule.generate.maintenance.series-RAV.year-2025.model-B1RFVT.maintenance-id-2707.type-milage.count-10.average-1333.pdf"
       },
-      "timeSource": {
-        "label": "Toyota Canada: 2025 Owner's Manual Supplement, p. 25 (every 6 months or 8,000 km)",
-        "url": "https://www.toyota.ca/content/dam/toyota/pdf/2025_owners_supplement_en.pdf#page=25"
-      },
       "items": [
         {
           "id": "inspection",
           "name": "Service visit (inspection and tire rotation)",
           "everyKm": 8000,
-          "everyMonths": 6,
           "page": 1,
           "detailsPage": 3,
           "includes": "Lights, horn and wipers; tire tread and damage; wheels off to inspect brake pads, rotors and lines; rotate tires; remove and inspect cabin and engine air filters; check for fluid leaks; reset the maintenance reminder."
@@ -25,36 +20,28 @@
           "id": "oil_change",
           "name": "Engine oil and filter replacement",
           "everyKm": 16000,
-          "everyMonths": 12,
           "page": 1,
-          "detailsPage": 3,
-          "monthsNote": "Every second 6-month visit (Service #2 and #3)."
+          "detailsPage": 3
         },
         {
           "id": "major_inspection",
           "name": "Detailed inspection: measure brakes, 12-volt battery check",
           "everyKm": 32000,
-          "everyMonths": 24,
           "page": 1,
           "detailsPage": 4,
-          "includes": "Service #3: remove calipers and measure brake pads and rotors; 12-volt battery health check; valve clearance; fuel system and cooler lines.",
-          "monthsNote": "Every fourth 6-month visit."
+          "includes": "Service #3: remove calipers and measure brake pads and rotors; 12-volt battery health check; valve clearance; fuel system and cooler lines."
         },
         {
           "id": "brake_fluid",
           "name": "Brake fluid replacement",
           "everyKm": 48000,
-          "everyMonths": 36,
-          "page": 1,
-          "monthsNote": "Every sixth 6-month visit."
+          "page": 1
         },
         {
           "id": "transfer_case_fluid",
           "name": "Transfer case fluid replacement (AWD)",
           "everyKm": 48000,
-          "everyMonths": 36,
-          "page": 1,
-          "monthsNote": "Every sixth 6-month visit."
+          "page": 1
         },
         {
           "id": "tire_rotation",
@@ -102,13 +89,44 @@
     },
     "rav4-hybrid-2026": {
       "label": "2026 Toyota RAV4 Hybrid",
-      "source": { "label": "Toyota owner's manuals and maintenance schedules (sample schedule)", "url": "https://www.toyota.com/owners/" },
+      "source": {
+        "label": "Toyota owner's manuals and maintenance schedules (sample schedule)",
+        "url": "https://www.toyota.com/owners/"
+      },
       "items": [
-        { "id": "inspection", "name": "Service visit (inspection and tire rotation)", "everyKm": 8000, "everyMonths": 6, "page": null },
-        { "id": "oil_change", "name": "Oil and filter change", "everyKm": 16000, "everyMonths": 12, "page": null },
-        { "id": "tire_rotation", "name": "Tire rotation", "partOf": "inspection", "page": null, "note": "Rotated at every service visit (sample schedule)." },
-        { "id": "cabin_air_filter", "name": "Cabin air filter", "partOf": "inspection", "page": null, "note": "Inspected at every service visit (sample schedule)." },
-        { "id": "engine_air_filter", "name": "Engine air filter", "partOf": "inspection", "page": null, "note": "Inspected at every service visit (sample schedule)." }
+        {
+          "id": "inspection",
+          "name": "Service visit (inspection and tire rotation)",
+          "everyKm": 8000,
+          "page": null
+        },
+        {
+          "id": "oil_change",
+          "name": "Oil and filter change",
+          "everyKm": 16000,
+          "page": null
+        },
+        {
+          "id": "tire_rotation",
+          "name": "Tire rotation",
+          "partOf": "inspection",
+          "page": null,
+          "note": "Rotated at every service visit (sample schedule)."
+        },
+        {
+          "id": "cabin_air_filter",
+          "name": "Cabin air filter",
+          "partOf": "inspection",
+          "page": null,
+          "note": "Inspected at every service visit (sample schedule)."
+        },
+        {
+          "id": "engine_air_filter",
+          "name": "Engine air filter",
+          "partOf": "inspection",
+          "page": null,
+          "note": "Inspected at every service visit (sample schedule)."
+        }
       ]
     }
   }

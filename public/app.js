@@ -63,7 +63,7 @@ function renderGarage(garage) {
       : el("p", { className: "note", textContent: "Nothing is due right now." }));
     document.getElementById("due-next").replaceChildren(...next.map(dueItem));
     document.getElementById("due-source").textContent =
-      "Each item is due at a distance or after a time, whichever comes first. Dates are estimates from how much you drive.";
+      "Due points are in km from Toyota's schedule. Dates are estimates based on how much you drive.";
   }
 
   const select = document.getElementById("service-select");
