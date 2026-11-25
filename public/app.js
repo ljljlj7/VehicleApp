@@ -124,6 +124,7 @@ function renderGarage(garage) {
   currentGarage = garage;
   renderHistory(garage);
   renderServiceSelect(garage.serviceOptions);
+  if (typeof prefillNew === "function" && !itemForm.elements.service.value) prefillNew();
 }
 
 async function loadGarage() {
@@ -397,12 +398,25 @@ function startEdit(h, status = null) {
   f.service.focus();
 }
 
+// A new entry starts with the car's (simulated) date and current km from the connected car.
+function prefillNew() {
+  if (!currentGarage || itemForm.elements.id.value) return;
+  itemForm.elements.date.value = currentGarage.car.today;
+  itemForm.elements.date.max = currentGarage.car.today;
+  itemForm.elements.mileageKm.value = currentGarage.car.mileageKm;
+}
+
 function stopEdit() {
   itemForm.reset();
   itemForm.elements.id.value = "";
   setFormMode(null);
   updateServiceHint();
+  prefillNew();
 }
+
+document.getElementById("add-item").addEventListener("toggle", (event) => {
+  if (event.currentTarget.open && !itemForm.elements.id.value && !itemForm.elements.service.value) prefillNew();
+});
 
 document.getElementById("item-cancel").addEventListener("click", () => {
   stopEdit();

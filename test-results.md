@@ -3,6 +3,17 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Last service = service visits only; date and km pre-filled: 2026-11-25
+
+- "Last service" now shows only a logged Toyota **service visit**. The sample's Nov 2 early oil change no longer
+  appears there (it still moves the oil change to the 24,000 km card, and it is in the history), so the sample timeline
+  starts with "Next service 8,000 km".
+- "Add a service" opens with the car's (simulated) date and current km filled in, and follows "Simulate a week".
+
+Clicked through in Chrome at 1280 px: first card "Next service / 8,000 km / Est. Dec 2026"; form on open Nov 25, 2026 ·
+7,000 km; after Simulate a week Dec 2, 2026 · 7,200 km; logging "Service visit" created "Last service / 7,200 km / Dec 2026"
+(next service then 15,200 km). T1–T16 re-run: pass (basic answers).
+
 ## Service history: scheduled vs. other work: 2026-11-25
 
 Changes: the service list has two groups ("Scheduled by Toyota (updates your reminders)" and "Repairs and other work

@@ -17,7 +17,7 @@ part of the product (PRD section 5).
 
 | Step | Say | Do | Audience sees |
 |------|-----|----|---------------|
-| 0a | "The app is connected to the car, so it knows the mileage. For the prototype we simulate that." | Point at the top bar and the **Service timeline** | 7,000 km, about 200 km a week; last service at 6,343 km; next service at 8,000 km, est. Dec 2026. Click **Brake measurement & battery check** on the 32,000 km card: a pop-up explains it, with a link to Toyota's schedule |
+| 0a | "The app is connected to the car, so it knows the mileage. For the prototype we simulate that." | Point at the top bar and the **Service timeline** | 7,000 km, about 200 km a week; next service at 8,000 km, est. Dec 2026 (the first Toyota visit; no service visit logged yet). Click **Brake measurement & battery check** on the 32,000 km card: a pop-up explains it, with a link to Toyota's schedule |
 | 0b | "A chat can't do this: it tells you before you ask." | Press **Simulate a week** five or six times | Mileage and date go up; the next service turns red (overdue) once the car passes 8,000 km |
 | 1 | "A dealer told our user their $200 air filter job was needed. Is it?" | Paste T1 and press **Check it** | Quote marked above the typical range; Toyota's own schedule only *inspects* the filter at each visit and replaces it if dirty (with the Toyota page as source); DIY 1/5 |
 | 2 | "Could they do it themselves?" | Press **Parts & tools to DIY** | Parts, tools, video guide link |
@@ -25,7 +25,7 @@ part of the product (PRD section 5).
 | 4 | "Safety comes first." | Paste T3 (1 mm brakes) | Red safety warning, "do not leave them", disclaimer |
 | 5 | "It knows the car's history." | Paste T5 (service history) | Confirmed work vs recommended |
 | 6 | "If it doesn't know enough, it asks instead of guessing." | Paste T6 (2026 RAV4 Hybrid) | Asks for trim and mileage |
-| 7 | "You log a service once, and the reminders update." | Open **Add a service**, pick **Service visit (inspection and tire rotation)**, the simulated date shown in the top bar, the current km, $0, press **Save**, then press F5 | The item is still there after the reload; it becomes the "Last service" card and the next service moves 8,000 km on |
+| 7 | "You log a service once, and the reminders update." | Open **Add a service**, pick **Service visit (inspection and tire rotation)** (date and km are already filled in from the car), cost $0, press **Save**, then press F5 | The item is still there after the reload; a "Last service" card appears at the start of the timeline and the next service moves 8,000 km on |
 | 7b | "Dealer recommendations stay open until you decide." | In **Open recommendations**, press **Mark done** on the air filters (or **Decline**) | The form fills in today's date and km; after saving, the recommendation leaves the open list. Air filters are repairs, so the timeline does not change |
 | 8 | "And it checks what you type." | Click **Correct mileage**, type `eight thousand`, press **Update**; then press **Check it** with an empty box | Both refused with a clear message |
 | 9 | "If something looks wrong, users can flag it." | Click **Report a problem with this answer** | Report saved for the developers |
