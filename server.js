@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // known services (e.g. brakes), then "Other". Picking from a list lets the minder count it.
 function serviceOptions(vehicle) {
   const schedule = minder.scheduleFor(vehicle.modelId);
-  const fromSchedule = schedule ? schedule.items.map((i) => ({ id: i.id, name: i.name })) : [];
+  const fromSchedule = schedule ? schedule.items.filter((i) => !i.partOf).map((i) => ({ id: i.id, name: i.name })) : [];
   const extra = KB.services.filter((s) => !fromSchedule.some((o) => o.id === s.id)).map((s) => ({ id: s.id, name: s.name }));
   return [...fromSchedule, ...extra, { id: "other", name: "Other (describe it below)" }];
 }

@@ -38,6 +38,17 @@ function scheduleFor(modelId) {
   return SCHEDULES.vehicles[modelId] || null;
 }
 
+// The schedule entry for a service (e.g. "cabin_air_filter"), if the schedule mentions it.
+function findItem(schedule, serviceId) {
+  return schedule ? schedule.items.find((i) => i.id === serviceId) || null : null;
+}
+
+// Link to the schedule PDF, opened at the item's page.
+function pageLink(schedule, page) {
+  if (page == null) return { label: "Source", url: schedule.source.url };
+  return { label: `Toyota schedule p. ${page}`, url: `${schedule.source.url}#page=${page}` };
+}
+
 // The latest reading is the car's current mileage.
 function latestReading(readings) {
   return [...readings].sort((a, b) => a.date.localeCompare(b.date)).at(-1) || null;
@@ -83,10 +94,11 @@ function describe(item) {
 
 const STATUS_ORDER = { overdue: 0, soon: 1, later: 2 };
 
-// Work out every schedule item's next due point.
+// Work out every schedule item's next due point. Items that are "part of" another item
+// (e.g. the air filter check is part of the service visit) have no interval of their own.
 // today, startDate and rate may be missing (e.g. a car that is not in the garage): then only km is used.
 function computeDue({ schedule, mileageKm, today = null, startDate = null, history = [], rate = null }) {
-  const items = schedule.items.map((item) => {
+  const items = schedule.items.filter((item) => !item.partOf).map((item) => {
     const done = history
       .filter((h) => h.status === "done" && (h.services || []).includes(item.id))
       .sort((a, b) => b.date.localeCompare(a.date) || b.mileageKm - a.mileageKm)[0] || null;
@@ -115,7 +127,8 @@ function computeDue({ schedule, mileageKm, today = null, startDate = null, histo
       daysLeft,
       lastDone: done ? { date: done.date, mileageKm: done.mileageKm } : null,
       page: item.page,
-      source: schedule.source,
+      includes: item.includes || null,
+      link: pageLink(schedule, item.page),
     };
     return { ...result, text: describe(result) };
   });
@@ -146,4 +159,4 @@ function garageStatus(vehicle, car, history) {
   };
 }
 
-module.exports = { scheduleFor, computeDue, garageStatus, kmPerDay, latestReading, addDays, fmtDate, fmtKm };
+module.exports = { scheduleFor, findItem, pageLink, computeDue, garageStatus, kmPerDay, latestReading, addDays, fmtDate, fmtKm };

@@ -61,8 +61,16 @@ function historyFor(service, history) {
 // What the schedule says about this service, worked out by the minder.
 function dueNote(service, due) {
   if (!due) return "Tell us your mileage to check this against the maintenance schedule.";
+  const entry = minder.findItem(due.schedule, service.id);
+  if (!entry) return "This is not on the regular maintenance schedule; it depends on what an inspection finds.";
+  // Some services have no interval of their own: they are part of a regular visit.
+  if (entry.partOf) {
+    const visit = due.items.find((i) => i.id === entry.partOf);
+    if (!visit) return entry.note;
+    const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+    return [entry.note, `Next ${visit.name.toLowerCase()}: ${lower(visit.text.when)}.`, visit.text.expected && `${visit.text.expected}.`].filter(Boolean).join(" ");
+  }
   const item = due.items.find((i) => i.id === service.id);
-  if (!item) return "This is not on the regular maintenance schedule; it depends on what an inspection finds.";
   const { when, expected, last } = item.text;
   const lead = {
     overdue: "Overdue according to the schedule.",
@@ -81,11 +89,20 @@ function dueFor(vehicleId, mileageKm, garage, usingSaved) {
   if (usingSaved && garage.car) {
     const rate = minder.kmPerDay(garage.car.readings, garage.car.today);
     return {
-      source: schedule.source,
+      schedule,
       items: minder.computeDue({ schedule, mileageKm, today: garage.car.today, startDate: garage.vehicle.startDate, history: garage.history, rate }),
     };
   }
-  return { source: schedule.source, items: minder.computeDue({ schedule, mileageKm }) };
+  return { schedule, items: minder.computeDue({ schedule, mileageKm }) };
+}
+
+// Sources for an answer: the schedule pages it relied on, and the 6-month rule if it used dates.
+function scheduleSources(schedule, serviceIds = []) {
+  if (!schedule) return [];
+  const pages = [...new Set(serviceIds.map((id) => minder.findItem(schedule, id)).filter(Boolean).map((i) => i.page))];
+  const links = pages.length ? pages.map((p) => minder.pageLink(schedule, p)) : [minder.pageLink(schedule, schedule.items[0].page)];
+  return [...links.map((l) => ({ label: `${schedule.source.label}${l.label.startsWith("Toyota") ? `, ${l.label.replace("Toyota schedule ", "")}` : ""}`, url: l.url })),
+    ...(schedule.timeSource ? [schedule.timeSource] : [])];
 }
 
 function brakeNote(service, mm) {
@@ -160,7 +177,7 @@ function check(question, garage) {
   const vLabel = vehicleLabel(vehicle);
   const due = dueFor(vehicleId, mileageKm, garage, usingSaved);
   const schedule = minder.scheduleFor(vehicleId);
-  const base = { disclaimer: KB.disclaimer, sources: schedule ? [schedule.source] : [] };
+  const base = { disclaimer: KB.disclaimer, sources: scheduleSources(schedule, services.map((s) => s.id)) };
   const ctx = {
     vehicleText: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
     mileageKm,

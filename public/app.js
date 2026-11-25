@@ -35,14 +35,13 @@ function historyRow(entry) {
 const DUE_LABEL = { overdue: "Overdue", soon: "Due now", later: "" };
 
 function dueItem(item) {
-  const source = item.page != null
-    ? el("a", { href: item.source.url, target: "_blank", rel: "noopener", textContent: `Guide p. ${item.page}` })
-    : el("a", { href: item.source.url, target: "_blank", rel: "noopener", textContent: "Source" });
+  const source = el("a", { href: item.link.url, target: "_blank", rel: "noopener", textContent: item.link.label });
   return el("li", { className: `due ${item.status}` },
     el("div", { className: "service-head" },
       el("strong", { textContent: item.name }),
       DUE_LABEL[item.status] && el("span", { className: `pill ${item.status}`, textContent: DUE_LABEL[item.status] })),
     el("div", { textContent: item.text.when }),
+    item.includes && item.status !== "later" && el("div", { className: "meta", textContent: `Includes: ${item.includes}` }),
     el("div", { className: "meta" }, [item.text.expected, item.text.last].filter(Boolean).join(" · "), " · ", source));
 }
 

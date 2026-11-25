@@ -20,7 +20,7 @@ part of the product (PRD section 5).
 |------|-----|----|---------------|
 | 0a | "The app is connected to the car, so it knows the mileage. For the prototype we simulate that." | Point at **My car** and **What's due** | 7,000 km, about 198 km a week; inspection due now, what comes next with dates |
 | 0b | "A chat can't do this: it tells you before you ask." | Press **Simulate a week of driving** two or three times | Mileage and date go up; the inspection gets closer, then turns red (overdue) after Dec 14 |
-| 1 | "A dealer told our user their $200 air filter job was needed. Is it?" | Paste T1 and press **Check it** | Quote marked above the typical range, routine, likely early at 7,000 km, DIY 1/5 |
+| 1 | "A dealer told our user their $200 air filter job was needed. Is it?" | Paste T1 and press **Check it** | Quote marked above the typical range; Toyota's own schedule only *inspects* the filter at each visit and replaces it if dirty (with the Toyota page as source); DIY 1/5 |
 | 2 | "Could they do it themselves?" | Press **Parts & tools to DIY** | Parts, tools, video guide link |
 | 3 | "And to compare prices?" | Press **Pricing research** | Price search links |
 | 4 | "Safety comes first." | Paste T3 (1 mm brakes) | Red safety warning, "do not leave them", disclaimer |

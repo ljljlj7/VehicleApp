@@ -3,6 +3,34 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## M5b Real schedule: 2026-11-25
+
+**Where:** laptop (Mac), http://localhost:3000, clicked through by a script in Chrome at phone size (400 px wide).
+**AI:** off (no API key), so every question got a **Basic answer**.
+**Schedule:** Toyota Canada's official 2025 RAV4 LE AWD maintenance schedule (km), plus the "every 6 months or 8,000 km"
+rule from Toyota Canada's 2025 owner's supplement (p. 25). The demo car is now an LE AWD to match.
+
+**Second read of the schedule:** a separate script re-read the Toyota PDF and compared all 11 schedule items at every
+service visit from 8,000 to 120,000 km, plus the cited pages. Result: all items match, no problems found.
+
+| ID | What we saw | Result |
+|----|-------------|--------|
+| T1 | $200 quote above the typical range; "Toyota Canada's schedule has no set replacement interval for the engine air filter: it is removed and inspected at every service visit and replaced only if found dirty or damaged"; sources: schedule p. 3 and supplement p. 25 | Pass (basic answer) |
+| T2 | "Due now: Service visit (inspection and tire rotation). Due at 10,150 km or by Dec 14, 2026"; then oil at 22,500 km, detailed inspection at 32,000 km, brake fluid at 48,000 km; sources: schedule p. 1 | Pass (basic answer) |
+| T3 | Red safety warning, "do not leave them", disclaimer | Pass (basic answer) |
+| T4 | Empty box refused with a message | Pass |
+| T5 | History split into confirmed and recommended | Pass (basic answer) |
+| T6 | Asks for trim and mileage (the 2026 Hybrid still uses a sample schedule) | Pass (basic answer) |
+| T7 | Added "Engine oil and filter replacement" from the list, reloaded: still there, next oil moved to 23,100 km | Pass |
+| T8 | "eight thousand" refused under Correct the mileage | Pass |
+| T9 | Connected car (simulated), 7,000 km; service visit due now with what it includes; four items coming up | Pass |
+| T10 | Simulate a week: 7,198 km on Dec 2, 2026; still there after reload | Pass |
+| T11 | Link reads "Toyota schedule p. 1" and opens Toyota Canada's schedule PDF at page 1 | Pass |
+| T12 | "Toyota rotates the tires at every service visit. Next service visit: due at 10,150 km or by Dec 14, 2026" | Pass (basic answer) |
+| T13 | The owner's manual is now stored as 588 searchable pages (oil type and capacity on pages 498–499), but answering from it needs the AI (M6) | Not run |
+
+**Not run:** AI mode (no key), a real phone, a person clicking through (Linus to do).
+
 ## M5a Minder: 2026-11-25
 
 **Where:** laptop (Mac), http://localhost:3000, clicked through by a script in Chrome at phone size (400 px wide).

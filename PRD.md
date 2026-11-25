@@ -46,7 +46,7 @@ The app connects to the car, so it knows the mileage without the user typing it 
 ## 4. Scope
 ### Must have
 - F1 Legal disclaimer protecting product and company of liability and recommendation to get professional advice and review.
-- F2 Repository of factory technical manuals and recommended service intervals. The maintenance schedule is converted from the official Toyota maintenance guide into structured data by AI, then compared line by line against the guide in a second AI read (no human check in the prototype). Each schedule item keeps its guide page as the source. The owner's manual is stored as searchable pages.
+- F2 Repository of factory technical manuals and recommended service intervals. The maintenance schedule is converted from Toyota Canada's official maintenance schedule (in km) into structured data by AI, then checked by a second, independent read of the PDF that compares every item at every service visit (no human check in the prototype). Each schedule item keeps its page as the source. The owner's manual is stored as searchable pages.
 - F3 user interface that allows information for vehicles to be entered to reference manuals and recommended service. Based on mileage input.
 - F4 sourced links to any information presented as facts
 - F5 logged history of vehicle to use as a reference source. New entries are picked from a list of services, so each one updates what is due.
