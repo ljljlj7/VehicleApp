@@ -10,7 +10,7 @@ const shortDate = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-CA", 
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
   Object.assign(node, props);
-  node.append(...children.flat().filter((c) => c != null && c !== false && c !== ""));
+  node.append(...children.flat(Infinity).filter((c) => c != null && c !== false && c !== ""));
   return node;
 }
 const extLink = (l, text = l.label) => el("a", { href: l.url, target: "_blank", rel: "noopener", textContent: text });
@@ -21,34 +21,68 @@ function plainList(items) {
 
 // --- The car, the timeline and the history -----------------------------------
 
-// One service visit in the timeline (Toyota-style card).
-function visitCard(v, index) {
-  const label = index === 0
-    ? (v.status === "overdue" ? "Overdue" : "Next service")
-    : "Later";
-  const overdue = index === 0 && v.kmLeft <= 0;
-  const cls = index === 0 ? (v.status === "overdue" ? "visit overdue" : "visit next") : "visit";
-  return el("li", { className: cls },
-    el("div", { className: "visit-top" },
-      el("p", { className: "visit-label", textContent: label }),
-      el("p", { className: "visit-km", textContent: km(v.km) }),
-      el("p", { className: "visit-date", textContent: overdue ? `Overdue by ${km(-v.kmLeft)}` : v.dateLabel ? `Est. ${v.dateLabel}` : "" }),
-      index === 0 && !overdue && v.inLabel && el("p", { className: "visit-when", textContent: v.inLabel.replace(/^in /, "In ") })),
-    el("div", { className: "visit-body" },
-      el("ul", { className: "visit-items" }, v.items.map((i) => el("li", {}, el("a", {
-        href: i.link.url, target: "_blank", rel: "noopener", textContent: i.name, title: `What's included: ${i.link.label}` }))))));
+// The timeline: Toyota-style cards. Clicking a card shows what it includes below.
+let timelineState = { cards: [], selected: null };
+
+function cardButton(card, isSelected) {
+  const top = el("span", { className: "visit-top" },
+    el("span", { className: "visit-label", textContent: card.label }),
+    el("span", { className: "visit-km", textContent: km(card.km) }),
+    el("span", { className: "visit-date", textContent: card.dateText }),
+    card.inText && el("span", { className: "visit-when", textContent: card.inText }));
+  const body = el("span", { className: "visit-body" },
+    el("span", { className: "visit-items" }, card.names.map((n) => el("span", { textContent: n }))));
+  const button = el("button", { type: "button", className: `visit ${card.kind}${isSelected ? " selected" : ""}` }, top, body);
+  button.setAttribute("aria-pressed", String(isSelected));
+  button.addEventListener("click", () => selectCard(card.key));
+  return el("li", {}, button);
 }
 
-// The last service from the history, as the first card.
-function lastCard(last) {
-  return el("li", { className: "visit past" },
-    el("div", { className: "visit-top" },
-      el("p", { className: "visit-label", textContent: "Last service" }),
-      el("p", { className: "visit-km", textContent: km(last.km) }),
-      el("p", { className: "visit-date", textContent: last.dateLabel })),
-    el("div", { className: "visit-body" },
-      el("ul", { className: "visit-items" }, el("li", { textContent: last.item })),
-      el("p", { className: "visit-source", textContent: `${last.shop} · ${money(last.cost)}` })));
+function renderDetails(card) {
+  const box = document.getElementById("visit-details");
+  if (!card) return box.replaceChildren();
+  const title = el("h3", { textContent: [card.label, km(card.km), card.dateText].filter(Boolean).join(" · ") });
+  if (card.kind === "past") {
+    return box.replaceChildren(title, el("p", { textContent: card.pastText }));
+  }
+  const pages = [...new Set(card.items.map((i) => i.link.label.replace("Toyota schedule ", "")))].join(", ");
+  box.replaceChildren(
+    title,
+    el("dl", {}, card.items.map((i) => [el("dt", { textContent: i.name }), el("dd", { textContent: i.description || "" })])),
+    el("p", { className: "visit-source" }, "Source: ",
+      extLink({ url: card.items[0].link.url }, `Toyota Canada maintenance schedule, 2025 RAV4 LE AWD (${pages})`)));
+}
+
+function selectCard(key) {
+  timelineState.selected = key;
+  const t = document.getElementById("timeline");
+  const scroll = t.scrollLeft;
+  t.replaceChildren(...timelineState.cards.map((c) => cardButton(c, c.key === key)));
+  t.scrollLeft = scroll;
+  renderDetails(timelineState.cards.find((c) => c.key === key));
+}
+
+function timelineCards(garage) {
+  const cards = [];
+  const last = garage.lastService;
+  if (last) {
+    cards.push({ key: "last", kind: "past", label: "Last service", km: last.km, dateText: last.dateLabel,
+      names: [last.item], pastText: `${last.item}. ${last.shop}, ${money(last.cost)}.` });
+  }
+  garage.timeline.forEach((v, i) => {
+    const overdue = i === 0 && v.kmLeft <= 0;
+    cards.push({
+      key: `km${v.km}`,
+      kind: i === 0 ? (v.status === "overdue" ? "overdue" : "next") : "later",
+      label: i === 0 ? (v.status === "overdue" ? "Overdue" : "Next service") : "Later",
+      km: v.km,
+      dateText: overdue ? `Overdue by ${km(-v.kmLeft)}` : v.dateLabel ? `Est. ${v.dateLabel}` : "",
+      inText: i === 0 && !overdue && v.inLabel ? v.inLabel.replace(/^in /, "In ") : null,
+      names: v.items.map((it) => it.name),
+      items: v.items,
+    });
+  });
+  return cards;
 }
 
 function historyRow(h) {
@@ -66,22 +100,16 @@ function renderGarage(garage) {
   document.getElementById("car-line").textContent = `${km(car.mileageKm)} · ${car.todayLabel}`;
   document.getElementById("mileage").placeholder = `e.g. ${car.mileageKm}`;
 
-  const cards = [
-    garage.lastService && lastCard(garage.lastService),
-    ...garage.timeline.map(visitCard),
-  ].filter(Boolean);
-  const timeline = document.getElementById("timeline");
-  timeline.replaceChildren(...cards);
+  const cards = timelineCards(garage);
+  const keep = cards.some((c) => c.key === timelineState.selected) ? timelineState.selected : null;
+  const next = cards.find((c) => c.kind === "next" || c.kind === "overdue");
+  timelineState = { cards, selected: keep || (next && next.key) };
+  selectCard(timelineState.selected);
   document.getElementById("due-source").textContent = car.kmPerWeek != null
-    ? `Dates are estimates from your driving (about ${km(car.kmPerWeek)} a week).`
+    ? `Dates are estimates from your driving (about ${km(car.kmPerWeek)} a week). Click a service to see what it includes.`
     : "";
-  const first = garage.timeline[0];
-  document.getElementById("timeline-source").replaceChildren(...(first
-    ? ["Source: ", extLink(first.source, `Toyota Canada maintenance schedule, 2025 RAV4 LE AWD (${first.source.label.replace("Toyota schedule ", "")})`),
-       ". Click a service to see what Toyota includes."]
-    : []));
   // Start with the last service and the next one in view.
-  timeline.scrollLeft = 0;
+  document.getElementById("timeline").scrollLeft = 0;
   updateScrollButtons();
 
   const history = [...garage.history].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);

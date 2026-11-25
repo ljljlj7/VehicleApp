@@ -3,6 +3,18 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Timeline details, local PDF, 200 km a week: 2026-11-25
+
+- Clicking a timeline card now shows what each service includes (Toyota's wording) in a panel below the timeline,
+  instead of linking to Toyota's site, which forced a download of the PDF.
+- The source link opens the app's own copy of Toyota's 5-page schedule PDF in the browser at the right page (T11).
+- The sample car drives exactly 200 km a week (history km adjusted to match: 6,343 km on Nov 2); "Simulate a week"
+  adds 200 km. The owner's supplement PDF is no longer used and was deleted.
+- Phone header fixed: brand, car, then the two buttons on their own row.
+
+Re-run in Chrome at 1280 px: T1–T12 pass as before (basic answers); T10 now 7,000 → 7,200 km on Dec 2, 2026; T11 opens
+`/docs/toyota-schedule-2025-rav4-le-awd.pdf#page=3` in the browser. Screenshot of the details panel: `15-timeline-details.jpg`.
+
 ## Redesign (desktop first, service timeline): 2026-11-25
 
 **Where:** laptop (Mac), http://localhost:3000, clicked through by a script in Chrome at **desktop width (1280 px)**;

@@ -82,7 +82,7 @@ Desktop first (the app is mainly used on a computer), and still works on a phone
 ## 6. Data, privacy and security
 **Data.** Product will have access to uploaded documents and data provided by user.  Examples include vehicle make, model and year.  As well as service and maintenance history.  Uploaded documents will also include contact information and service history and quotes.  None of this data should be sent or shared without user permission.
 
-The mileage readings from the "car" are made-up sample data. The schedule and manual come from Toyota's published documents, with page references. The manual PDFs are not saved to GitHub (too large, and Toyota owns them); the manual text is, so the repository must stay private.
+The mileage readings from the "car" are made-up sample data. The schedule and manual come from Toyota's published documents, with page references. The 5-page Toyota maintenance schedule PDF is saved in the app (public/docs) so its links open in the browser instead of downloading; the 592-page owner's manual PDF is not saved to GitHub (too large), only its text. Toyota owns both, so the repository must stay private.
 
 **Personal or confidential data.** Yes.
 

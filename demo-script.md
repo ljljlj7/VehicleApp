@@ -17,7 +17,7 @@ part of the product (PRD section 5).
 
 | Step | Say | Do | Audience sees |
 |------|-----|----|---------------|
-| 0a | "The app is connected to the car, so it knows the mileage. For the prototype we simulate that." | Point at the top bar and the **Service timeline** | 7,000 km; last service at 6,500 km; next service at 8,000 km, est. Dec 2026; later services with what Toyota includes |
+| 0a | "The app is connected to the car, so it knows the mileage. For the prototype we simulate that." | Point at the top bar and the **Service timeline** | 7,000 km, about 200 km a week; last service at 6,343 km; next service at 8,000 km, est. Dec 2026. Click a later card (e.g. 32,000 km) to show what Toyota includes |
 | 0b | "A chat can't do this: it tells you before you ask." | Press **Simulate a week** five or six times | Mileage and date go up; the next service turns red (overdue) once the car passes 8,000 km |
 | 1 | "A dealer told our user their $200 air filter job was needed. Is it?" | Paste T1 and press **Check it** | Quote marked above the typical range; Toyota's own schedule only *inspects* the filter at each visit and replaces it if dirty (with the Toyota page as source); DIY 1/5 |
 | 2 | "Could they do it themselves?" | Press **Parts & tools to DIY** | Parts, tools, video guide link |

@@ -16,43 +16,35 @@
     "readings": [
       {
         "date": "2026-04-01",
-        "km": 15
+        "km": 200
       },
       {
         "date": "2026-05-01",
-        "km": 880
+        "km": 1057
       },
       {
         "date": "2026-06-01",
-        "km": 1750
-      },
-      {
-        "date": "2026-06-14",
-        "km": 2150
+        "km": 1943
       },
       {
         "date": "2026-07-01",
-        "km": 2700
+        "km": 2800
       },
       {
         "date": "2026-08-01",
-        "km": 3650
+        "km": 3686
       },
       {
         "date": "2026-09-01",
-        "km": 4600
+        "km": 4571
       },
       {
         "date": "2026-10-01",
-        "km": 5500
+        "km": 5429
       },
       {
         "date": "2026-11-01",
-        "km": 6450
-      },
-      {
-        "date": "2026-11-02",
-        "km": 6500
+        "km": 6314
       },
       {
         "date": "2026-11-25",
@@ -64,7 +56,7 @@
     {
       "id": 1,
       "date": "2026-06-14",
-      "mileageKm": 2150,
+      "mileageKm": 2314,
       "item": "Complimentary inspection",
       "services": [],
       "status": "done",
@@ -74,7 +66,7 @@
     {
       "id": 2,
       "date": "2026-11-02",
-      "mileageKm": 6500,
+      "mileageKm": 6343,
       "item": "Oil and filter change, tire rotation",
       "services": [
         "oil_change",
@@ -87,7 +79,7 @@
     {
       "id": 3,
       "date": "2026-11-02",
-      "mileageKm": 6500,
+      "mileageKm": 6343,
       "item": "Replace cabin and engine air filters",
       "services": [
         "cabin_air_filter",

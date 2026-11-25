@@ -158,7 +158,7 @@ function buildTimeline({ schedule, dueItems, mileageKm, today, rate, visits = 10
       return false;
     });
     const items = [visitEntry, ...extras.map((i) => schedule.items.find((e) => e.id === i.id))]
-      .map((e) => ({ id: e.id, name: e.short || e.name, link: link(e) }));
+      .map((e) => ({ id: e.id, name: e.short || e.name, description: e.description || e.note || null, link: link(e) }));
     const kmLeft = km - mileageKm;
     const days = rate ? Math.max(0, Math.round(kmLeft / rate)) : null;
     const date = today && days != null ? addDays(today, days) : null;

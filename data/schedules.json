@@ -5,7 +5,8 @@
       "label": "2025 Toyota RAV4 LE AWD (Canada)",
       "source": {
         "label": "Toyota Canada: Maintenance Schedule, 2025 RAV4 LE AWD",
-        "url": "https://www.toyota.ca/content/toyota/en/owners/maintenance-schedule.generate.maintenance.series-RAV.year-2025.model-B1RFVT.maintenance-id-2707.type-milage.count-10.average-1333.pdf"
+        "url": "/docs/toyota-schedule-2025-rav4-le-awd.pdf",
+        "originalUrl": "https://www.toyota.ca/content/toyota/en/owners/maintenance-schedule.generate.maintenance.series-RAV.year-2025.model-B1RFVT.maintenance-id-2707.type-milage.count-10.average-1333.pdf"
       },
       "items": [
         {
@@ -15,7 +16,7 @@
           "everyKm": 8000,
           "page": 1,
           "detailsPage": 3,
-          "includes": "Lights, horn and wipers; tire tread and damage; wheels off to inspect brake pads, rotors and lines; rotate tires; remove and inspect cabin and engine air filters; check for fluid leaks; reset the maintenance reminder."
+          "description": "Toyota checks the lights, horn and wipers, tire tread, the brakes (wheels off), the cabin and engine air filters and any fluid leaks, and rotates the tires."
         },
         {
           "id": "oil_change",
@@ -23,7 +24,8 @@
           "short": "Oil & filter",
           "everyKm": 16000,
           "page": 1,
-          "detailsPage": 3
+          "detailsPage": 3,
+          "description": "Replace the engine oil and filter. On AWD models Toyota also tightens the propeller shaft bolts and checks the block heater (if equipped)."
         },
         {
           "id": "major_inspection",
@@ -32,21 +34,25 @@
           "everyKm": 32000,
           "page": 1,
           "detailsPage": 4,
-          "includes": "Service #3: remove calipers and measure brake pads and rotors; 12-volt battery health check; valve clearance; fuel system and cooler lines."
+          "description": "Toyota removes the brake calipers to measure the pads and rotors, checks the 12-volt battery, listens for valve clearance and inspects the fuel system."
         },
         {
           "id": "brake_fluid",
           "name": "Brake fluid replacement",
           "short": "Brake fluid",
           "everyKm": 48000,
-          "page": 1
+          "page": 1,
+          "description": "Replace the brake fluid.",
+          "detailsPage": 1
         },
         {
           "id": "transfer_case_fluid",
           "name": "Transfer case fluid replacement (AWD)",
           "short": "Transfer case fluid (AWD)",
           "everyKm": 48000,
-          "page": 1
+          "page": 1,
+          "description": "Replace the fluid in the AWD transfer case.",
+          "detailsPage": 1
         },
         {
           "id": "tire_rotation",
