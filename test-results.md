@@ -3,6 +3,14 @@
 Results from the builder (Claude Code) clicking through `acceptance-test.md` in the running app, on a phone-sized screen.
 The empty "Last run" and "Run by" columns in `acceptance-test.md` are for the team's tester to fill in after their own run.
 
+## Service pop-up: 2026-11-25
+
+Simplified: the details panel under the timeline is gone. Each service in a card is a link that opens a pop-up with
+Toyota's description and a link to the schedule PDF (opens in the browser at the right page). Re-run in Chrome at
+1280 px: T11 pop-up "Next service · 8,000 km · Est. Dec 2026 / Inspection & tire rotation / Toyota checks the lights…",
+link `/docs/toyota-schedule-2025-rav4-le-awd.pdf#page=3`, opens in a new tab. T1–T10 and T12 pass as before (basic
+answers). Screenshot: `15-timeline-details.jpg` now shows the pop-up.
+
 ## Timeline details, local PDF, 200 km a week: 2026-11-25
 
 - Clicking a timeline card now shows what each service includes (Toyota's wording) in a panel below the timeline,

@@ -14,6 +14,6 @@ Each test is one action and the result we expect to see. A person runs every tes
 | T8 | Submit with letters instead of numbers for mileage | Should not be allowed, should redirect user to enter numerical input | | |
 | T9 | Open the app | Main screen shows "Connected car (simulated)", the current mileage, and the service timeline: last service, next service (highlighted) and later services, each with km, estimated date and what is included | | |
 | T10 | Press "Simulate a week", then reload the page | Mileage and simulated date have gone up, the timeline has updated, and both are still there after the reload | | |
-| T11 | Click the source link under the service timeline | Opens the Toyota maintenance schedule, with the page number shown | | |
+| T11 | Click a service in the timeline, then the link in the pop-up | The pop-up explains the service; the link opens the Toyota maintenance schedule in the browser, with the page number shown | | |
 | T12 | Paste "The dealer says I need a tire rotation, is it due?" | Answer says whether it is due at the current mileage according to the schedule (with guide page), and when it was last done | | |
 | T13 | Paste "What oil does my car need and how much?" | Answer gives the oil type and amount, citing the page of the Toyota owner's manual | | |

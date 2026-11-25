@@ -43,7 +43,6 @@
         </div>
       </div>
       <ol class="timeline" id="timeline"></ol>
-      <div class="visit-details" id="visit-details" aria-live="polite"></div>
     </section>
 
     <div class="columns">
@@ -93,6 +92,14 @@
     Course prototype with made-up sample data. Auto-Mobile gives general information only, not professional advice;
     have a qualified technician check anything safety related.
   </footer>
+
+  <dialog id="service-dialog" aria-labelledby="service-dialog-title">
+    <form method="dialog" class="dialog-close"><button type="submit" class="icon-button" aria-label="Close">×</button></form>
+    <p class="dialog-context" id="service-dialog-context"></p>
+    <h2 id="service-dialog-title"></h2>
+    <p id="service-dialog-text"></p>
+    <a id="service-dialog-link" target="_blank" rel="noopener"></a>
+  </dialog>
 
   <script src="app.js"></script>
 </body>

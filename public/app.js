@@ -21,69 +21,46 @@ function plainList(items) {
 
 // --- The car, the timeline and the history -----------------------------------
 
-// The timeline: Toyota-style cards. Clicking a card shows what it includes below.
-let timelineState = { cards: [], selected: null };
-
-function cardButton(card, isSelected) {
-  const top = el("span", { className: "visit-top" },
-    el("span", { className: "visit-label", textContent: card.label }),
-    el("span", { className: "visit-km", textContent: km(card.km) }),
-    el("span", { className: "visit-date", textContent: card.dateText }),
-    card.inText && el("span", { className: "visit-when", textContent: card.inText }));
-  const body = el("span", { className: "visit-body" },
-    el("span", { className: "visit-items" }, card.names.map((n) => el("span", { textContent: n }))));
-  const button = el("button", { type: "button", className: `visit ${card.kind}${isSelected ? " selected" : ""}` }, top, body);
-  button.setAttribute("aria-pressed", String(isSelected));
-  button.addEventListener("click", () => selectCard(card.key));
-  return el("li", {}, button);
+// The timeline: Toyota-style cards. Each service opens a pop-up with its details.
+function openService(item, context) {
+  document.getElementById("service-dialog-context").textContent = context;
+  document.getElementById("service-dialog-title").textContent = item.name;
+  document.getElementById("service-dialog-text").textContent = item.description || "";
+  const link = document.getElementById("service-dialog-link");
+  link.href = item.link.url;
+  link.textContent = `Open Toyota's maintenance schedule (${item.link.label.replace("Toyota schedule ", "")})`;
+  document.getElementById("service-dialog").showModal();
 }
 
-function renderDetails(card) {
-  const box = document.getElementById("visit-details");
-  if (!card) return box.replaceChildren();
-  const title = el("h3", { textContent: [card.label, km(card.km), card.dateText].filter(Boolean).join(" · ") });
-  if (card.kind === "past") {
-    return box.replaceChildren(title, el("p", { textContent: card.pastText }));
-  }
-  const pages = [...new Set(card.items.map((i) => i.link.label.replace("Toyota schedule ", "")))].join(", ");
-  box.replaceChildren(
-    title,
-    el("dl", {}, card.items.map((i) => [el("dt", { textContent: i.name }), el("dd", { textContent: i.description || "" })])),
-    el("p", { className: "visit-source" }, "Source: ",
-      extLink({ url: card.items[0].link.url }, `Toyota Canada maintenance schedule, 2025 RAV4 LE AWD (${pages})`)));
+function visitCard(v, i) {
+  const overdue = i === 0 && v.kmLeft <= 0;
+  const kind = i === 0 ? (overdue ? "overdue" : "next") : "later";
+  const label = i === 0 ? (overdue ? "Overdue" : "Next service") : "Later";
+  const dateText = overdue ? `Overdue by ${km(-v.kmLeft)}` : v.dateLabel ? `Est. ${v.dateLabel}` : "";
+  const context = [label, km(v.km), dateText].filter(Boolean).join(" · ");
+  return el("li", { className: `visit ${kind}` },
+    el("div", { className: "visit-top" },
+      el("p", { className: "visit-label", textContent: label }),
+      el("p", { className: "visit-km", textContent: km(v.km) }),
+      el("p", { className: "visit-date", textContent: dateText }),
+      i === 0 && !overdue && v.inLabel && el("p", { className: "visit-when", textContent: v.inLabel.replace(/^in /, "In ") })),
+    el("ul", { className: "visit-items" }, v.items.map((it) => el("li", {},
+      el("button", { type: "button", className: "service-link", textContent: it.name, onclick: () => openService(it, context) })))));
 }
 
-function selectCard(key) {
-  timelineState.selected = key;
-  const t = document.getElementById("timeline");
-  const scroll = t.scrollLeft;
-  t.replaceChildren(...timelineState.cards.map((c) => cardButton(c, c.key === key)));
-  t.scrollLeft = scroll;
-  renderDetails(timelineState.cards.find((c) => c.key === key));
+function lastCard(last) {
+  return el("li", { className: "visit past" },
+    el("div", { className: "visit-top" },
+      el("p", { className: "visit-label", textContent: "Last service" }),
+      el("p", { className: "visit-km", textContent: km(last.km) }),
+      el("p", { className: "visit-date", textContent: last.dateLabel })),
+    el("ul", { className: "visit-items" }, el("li", { textContent: last.item })));
 }
 
-function timelineCards(garage) {
-  const cards = [];
-  const last = garage.lastService;
-  if (last) {
-    cards.push({ key: "last", kind: "past", label: "Last service", km: last.km, dateText: last.dateLabel,
-      names: [last.item], pastText: `${last.item}. ${last.shop}, ${money(last.cost)}.` });
-  }
-  garage.timeline.forEach((v, i) => {
-    const overdue = i === 0 && v.kmLeft <= 0;
-    cards.push({
-      key: `km${v.km}`,
-      kind: i === 0 ? (v.status === "overdue" ? "overdue" : "next") : "later",
-      label: i === 0 ? (v.status === "overdue" ? "Overdue" : "Next service") : "Later",
-      km: v.km,
-      dateText: overdue ? `Overdue by ${km(-v.kmLeft)}` : v.dateLabel ? `Est. ${v.dateLabel}` : "",
-      inText: i === 0 && !overdue && v.inLabel ? v.inLabel.replace(/^in /, "In ") : null,
-      names: v.items.map((it) => it.name),
-      items: v.items,
-    });
-  });
-  return cards;
-}
+// Close the pop-up when clicking outside it.
+document.getElementById("service-dialog").addEventListener("click", (event) => {
+  if (event.target === event.currentTarget) event.currentTarget.close();
+});
 
 function historyRow(h) {
   return el("li", {},
@@ -100,13 +77,10 @@ function renderGarage(garage) {
   document.getElementById("car-line").textContent = `${km(car.mileageKm)} · ${car.todayLabel}`;
   document.getElementById("mileage").placeholder = `e.g. ${car.mileageKm}`;
 
-  const cards = timelineCards(garage);
-  const keep = cards.some((c) => c.key === timelineState.selected) ? timelineState.selected : null;
-  const next = cards.find((c) => c.kind === "next" || c.kind === "overdue");
-  timelineState = { cards, selected: keep || (next && next.key) };
-  selectCard(timelineState.selected);
+  document.getElementById("timeline").replaceChildren(
+    ...[garage.lastService && lastCard(garage.lastService), ...garage.timeline.map(visitCard)].filter(Boolean));
   document.getElementById("due-source").textContent = car.kmPerWeek != null
-    ? `Dates are estimates from your driving (about ${km(car.kmPerWeek)} a week). Click a service to see what it includes.`
+    ? `Dates are estimates from your driving (about ${km(car.kmPerWeek)} a week). Click a service for details.`
     : "";
   // Start with the last service and the next one in view.
   document.getElementById("timeline").scrollLeft = 0;
